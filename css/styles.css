@@ -229,20 +229,22 @@ input {
   height: 62px;
   border-radius: 50% 50% 18px 18px / 86% 86% 14% 14%;
   background:
-    radial-gradient(120% 90% at 50% -10%, #2f3238, #101216 50%, #050506);
+    radial-gradient(ellipse at 32% 18%, rgba(255, 190, 170, 0.28), transparent 42%),
+    radial-gradient(120% 90% at 50% -10%, #e24a45, #c21c28 42%, #8a121c 78%, #5c0c12);
   box-shadow:
-    inset 0 10px 12px rgba(255, 255, 255, 0.05),
-    0 8px 0 #050506;
+    inset 0 10px 12px rgba(255, 210, 200, 0.22),
+    inset 0 -8px 10px rgba(60, 0, 8, 0.35),
+    0 8px 0 #6a1016;
 }
 .hood-scallop {
   display: block;
   width: 100%;
   height: 46px;
   margin-top: -10px;
-  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 8px 6px rgba(70, 0, 10, 0.55));
 }
 .hood-scallop path {
-  fill: #08090c;
+  fill: #b31822;
 }
 .bubble-cylinder {
   position: relative;
