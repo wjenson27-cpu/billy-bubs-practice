@@ -13,6 +13,7 @@
   var takeDown = false;
   var rolling = false;
   var lastWagerSet = [];
+  var acrossKind = "place";
   var suppressSpotClick = false;
 
   var els = {};
@@ -49,6 +50,7 @@
           state: state,
           selectedChip: selectedChip,
           lastWagerSet: lastWagerSet,
+          acrossKind: acrossKind,
         })
       );
     } catch (err) {
@@ -107,7 +109,7 @@
         n +
         '"><span class="place-k">Buy</span><small>' +
         buyPayLabel(n) +
-        '</small><span class="spot-amt"></span></button>' +
+        '</small><span class="off-tag">OFF</span><span class="spot-amt"></span></button>' +
         '<div class="n">' +
         numberLabel(n) +
         "</div>" +
@@ -115,7 +117,7 @@
         n +
         '"><span class="place-k">Place</span><small>' +
         placePayLabel(n) +
-        '</small><span class="spot-amt"></span></button>' +
+        '</small><span class="off-tag">OFF</span><span class="spot-amt"></span></button>' +
         '<div class="come-tags" data-come-tags="' +
         n +
         '"></div>' +
@@ -166,6 +168,9 @@
     }
     el.classList.toggle("is-locked", amt > 0 && !canAdd && !takeDown);
     el.classList.toggle("can-take", canTake);
+    if (spot.kind === "place" || spot.kind === "buy") {
+      el.classList.toggle("is-working-off", !E.placeBetsWorking(state));
+    }
   }
 
   function renderSpots() {
@@ -255,7 +260,9 @@
     }
     els.betList.innerHTML = items
       .map(function (b) {
-        return "<li><span>" + b.label + "</span><strong>" + formatMoney(b.amount) + "</strong></li>";
+        var extra = "";
+        if (state.betsOff && (b.kind === "place" || b.kind === "buy")) extra = " (off)";
+        return "<li><span>" + b.label + extra + "</span><strong>" + formatMoney(b.amount) + "</strong></li>";
       })
       .join("");
   }
@@ -331,6 +338,7 @@
     renderChips();
     els.rollBtn.disabled = rolling;
     updateRepeatButton();
+    updateMachineKeys();
     save();
   }
 
@@ -372,6 +380,89 @@
     var empty = !lastWagerSet || lastWagerSet.length === 0;
     els.repeatBtn.classList.toggle("is-disabled", empty);
     els.repeatBtn.setAttribute("aria-disabled", empty ? "true" : "false");
+  }
+
+  function updateMachineKeys() {
+    if (els.betsOffBtn) {
+      var off = !!state.betsOff;
+      els.betsOffBtn.classList.toggle("is-off", off);
+      els.betsOffBtn.setAttribute("aria-pressed", off ? "true" : "false");
+      if (els.betsOffKicker) els.betsOffKicker.textContent = off ? "OFF" : "Working";
+    }
+    if (els.acrossKicker) {
+      var kindLabel = acrossKind === "buy" ? "Buy" : "Place";
+      els.acrossKicker.textContent = kindLabel + " " + formatMoney(selectedChip);
+    }
+    if (els.startBetBtn) {
+      var hasStart = !!(state.startingWagerSet && state.startingWagerSet.length);
+      els.startBetBtn.classList.toggle("is-disabled", !hasStart);
+      els.startBetBtn.setAttribute("aria-disabled", hasStart ? "false" : "true");
+    }
+    document.body.classList.toggle("is-bets-off", !!state.betsOff);
+  }
+
+  function doBetsOff() {
+    if (rolling) return;
+    applyResult(E.setBetsOff(state, !state.betsOff));
+    toast(
+      state.betsOff
+        ? "Bets Off — Place and Buy will not win or lose until you turn them on."
+        : "Bets On — Place and Buy are working.",
+      "info"
+    );
+  }
+
+  function doAcross() {
+    if (rolling) return;
+    var kind = acrossKind === "buy" ? "buy" : "place";
+    var result = E.placeAcross(state, selectedChip, kind);
+    applyResult(result.state);
+    if (!result.placed.length) {
+      toast("Couldn’t place across — not enough credits.", "lose");
+      return;
+    }
+    rememberWagers();
+    render();
+    var nums = result.placed
+      .map(function (p) {
+        return p.number;
+      })
+      .join(", ");
+    var kindLabel = kind === "buy" ? "Buy" : "Place";
+    var msg = "Across: " + kindLabel + " " + formatMoney(selectedChip) + " on " + nums + ".";
+    if (result.skipped.length) {
+      var totalNums = result.placed.length + result.skipped.length;
+      msg +=
+        " Posted " +
+        result.placed.length +
+        " of " +
+        totalNums +
+        "." +
+        (result.shortfall ? " Short " + formatMoney(result.shortfall) + "." : "");
+    }
+    toast(msg, "info");
+  }
+
+  function doResetStarting() {
+    if (rolling) return;
+    var result = E.resetToStartingBets(state);
+    if (!result.ok) {
+      toast(result.error, "info");
+      return;
+    }
+    applyResult(result.state);
+    rememberWagers();
+    render();
+    if (!result.placed.length && !result.taken.length) {
+      toast("Already on the starting bet.", "info");
+      return;
+    }
+    var msg = "Reset to starting bet.";
+    var blocked = result.skipped.filter(function (s) {
+      return s.reason !== "already on";
+    });
+    if (blocked.length) msg += " Skipped bets you couldn’t restore.";
+    toast(msg, "info");
   }
 
   function doRepeat() {
@@ -428,6 +519,9 @@
     if (!res.ok) {
       toast(res.error, "lose");
       return;
+    }
+    if (spot.kind === "buy" || spot.kind === "place") {
+      acrossKind = spot.kind;
     }
     applyResult(res.state);
     rememberWagers();
@@ -534,6 +628,7 @@
         takeDown = false;
         renderChips();
         renderSpots();
+        updateMachineKeys();
       });
       els.chips.appendChild(btn);
     });
@@ -664,6 +759,9 @@
     });
     els.rollBtn.addEventListener("click", doRoll);
     els.repeatBtn.addEventListener("click", doRepeat);
+    els.betsOffBtn.addEventListener("click", doBetsOff);
+    els.acrossBtn.addEventListener("click", doAcross);
+    els.startBetBtn.addEventListener("click", doResetStarting);
     window.addEventListener("keydown", function (ev) {
       if (ev.code !== "Space") return;
       if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "BUTTON" || ev.target.tagName === "TEXTAREA")) return;
@@ -714,6 +812,11 @@
     els.btnTake = $("btn-take");
     els.rollBtn = $("roll-btn");
     els.repeatBtn = $("repeat-btn");
+    els.betsOffBtn = $("bets-off-btn");
+    els.betsOffKicker = $("bets-off-kicker");
+    els.acrossBtn = $("across-btn");
+    els.acrossKicker = $("across-kicker");
+    els.startBetBtn = $("start-bet-btn");
     els.dropOff = $("drop-off");
     els.table = $("table");
     els.betList = $("bet-list");
@@ -737,6 +840,7 @@
       state = E.normalizeState(saved.state);
       selectedChip = saved.selectedChip || 500;
       lastWagerSet = Array.isArray(saved.lastWagerSet) ? saved.lastWagerSet : E.snapshotWagers(state);
+      acrossKind = saved.acrossKind === "buy" ? "buy" : "place";
     } else {
       state = E.createGame();
       lastWagerSet = [];

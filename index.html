@@ -323,6 +323,22 @@
           </div>
         </div>
 
+        <div class="machine-keys">
+          <button type="button" class="machine-key bets-off-btn" id="bets-off-btn" aria-pressed="false">
+            <span class="key-lamp" aria-hidden="true"></span>
+            <span class="key-kicker" id="bets-off-kicker">Working</span>
+            <span class="key-label">BETS OFF</span>
+          </button>
+          <button type="button" class="machine-key across-btn" id="across-btn">
+            <span class="key-kicker" id="across-kicker">Place $5</span>
+            <span class="key-label">ACROSS</span>
+          </button>
+          <button type="button" class="machine-key start-bet-btn is-disabled" id="start-bet-btn" aria-disabled="true">
+            <span class="key-kicker">Starting bet</span>
+            <span class="key-label">RESET</span>
+          </button>
+        </div>
+
         <div class="shoot-row">
           <button type="button" class="repeat-btn is-disabled" id="repeat-btn" aria-disabled="true">
             <span class="repeat-kicker">Last bet</span>
@@ -438,6 +454,7 @@
             <p>
               Each point number has <strong>Buy above</strong> and <strong>Place below</strong>. Both stay up after a hit
               and lose on 7. Off on the come-out unless you check “Place &amp; Buy work on come-out.”
+              <strong>BETS OFF</strong> also parks Place and Buy so a 7 or number hit neither pays nor takes them down.
             </p>
             <ul>
               <li><strong>Place</strong> — 4/10 = 9:5 · 5/9 = 7:5 · 6/8 = 7:6. Crapless Place 2/12 = 11:2 · 3/11 = 11:4.</li>
@@ -450,6 +467,45 @@
                 the $20 stays up.
               </li>
             </ul>
+          </section>
+          <section>
+            <h3>Bets Off</h3>
+            <p>
+              <strong>BETS OFF</strong> is a machine-style toggle. Pressed and lit means Place and Buy are
+              <strong>off</strong>: they do not win or lose on the next 7 or number hit, and the chips stay
+              on the layout until you turn them back on. Same idea as calling “bets off” on a live table.
+            </p>
+            <ul>
+              <li><strong>Covered:</strong> Place and Buy on every number (Regular 4–6 / 8–10; Crapless also 2, 3, 11, 12).</li>
+              <li><strong>Not covered:</strong> Pass, Don't Pass, Come, Don't Come, Field, hardways, Hard Way All Day, Big Red, Horn, hops, C, E, Low/High/All. Those still win and lose as usual.</li>
+              <li>Come-out still treats Place/Buy as off unless you check “Place &amp; Buy work on come-out” <em>and</em> Bets Off is not lit.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Across</h3>
+            <p>
+              <strong>ACROSS</strong> posts the <strong>selected chip</strong> on every across number using
+              Place — or Buy if your last number bet was a Buy. Regular across is 4, 5, 6, 8, 9, 10.
+              Crapless also includes 2, 3, 11, and 12.
+            </p>
+            <p>
+              Each press <strong>adds one chip unit per number</strong> (it stacks; it does not top-up to a
+              cap). Numbers you cannot afford are skipped. A toast lists what posted and any shortfall.
+            </p>
+          </section>
+          <section>
+            <h3>Reset to starting bet</h3>
+            <p>
+              The machine snapshots your layout on the <strong>first come-out roll with bets up</strong>
+              this hand. That is the starting bet. A new hand (and a new snapshot) begins after a
+              <strong>seven-out</strong>, a new session, or a rules switch.
+            </p>
+            <p>
+              <strong>RESET</strong> takes down extra removable bets and re-posts that starting set, skipping
+              anything locked or too expensive for the current credits and phase. It is not
+              <strong>REPEAT</strong>: Repeat is the previous roll’s set; Reset is the opening layout of
+              the hand.
+            </p>
           </section>
           <section>
             <h3>Repeat last bet</h3>

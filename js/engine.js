@@ -100,6 +100,9 @@
     if (!state.progress.tall) state.progress.tall = {};
     if (!state.progress.all) state.progress.all = {};
     if (!state.progress.hardAllDay) state.progress.hardAllDay = {};
+    if (state.betsOff == null) state.betsOff = false;
+    if (!Array.isArray(state.startingWagerSet)) state.startingWagerSet = [];
+    if (state.startingBetLocked == null) state.startingBetLocked = false;
     return state;
   }
 
@@ -114,6 +117,9 @@
       bets: emptyBets(),
       placeWorkingOnComeOut: false,
       comeOddsOffOnComeOut: true,
+      betsOff: false,
+      startingWagerSet: [],
+      startingBetLocked: false,
       lastDice: null,
       progress: emptyProgress(),
       history: [],
@@ -137,6 +143,12 @@
 
   function isComeOut(state) {
     return state.phase === "come-out";
+  }
+
+  /** Place/Buy are working unless Bets Off, and unless come-out without the working-on-come-out option. */
+  function placeBetsWorking(state) {
+    if (state.betsOff) return false;
+    return !isComeOut(state) || !!state.placeWorkingOnComeOut;
   }
 
   function tableTotal(bets) {
@@ -634,6 +646,9 @@
     next.phase = "come-out";
     next.point = null;
     next.lastDice = null;
+    next.betsOff = false;
+    next.startingWagerSet = [];
+    next.startingBetLocked = false;
     pushLog(next, {
       type: "info",
       text:
@@ -724,6 +739,14 @@
     var comeOut = isComeOut(next);
     var crapless = isCrapless(next);
     var point = next.point;
+
+    if (comeOut && !next.startingBetLocked) {
+      var opening = snapshotWagers(next);
+      if (opening.length) {
+        next.startingWagerSet = opening;
+        next.startingBetLocked = true;
+      }
+    }
 
     next.stats.rolls += 1;
     next.lastDice = { d1: d1, d2: d2, total: total, hard: hard };
@@ -839,7 +862,7 @@
       }
     })();
 
-    var placeWorking = !comeOut || next.placeWorkingOnComeOut;
+    var placeWorking = placeBetsWorking(next);
     var pn, pa;
     if (placeWorking) {
       if (total === 7) {
@@ -1087,6 +1110,7 @@
       next.point = null;
       next.bets.passOdds = 0;
       next.bets.dontPassOdds = 0;
+      next.startingBetLocked = false;
       narrative = "Seven-out. Line down. Puck OFF.";
     } else if (total === point) {
       if (next.bets.pass) {
@@ -1211,6 +1235,139 @@
     return { ok: true, state: next, placed: placed, skipped: skipped };
   }
 
+  function wagerKey(kind, number) {
+    return kind + ":" + (number == null || number === undefined ? "" : number);
+  }
+
+  function setBetsOff(state, off) {
+    var next = clone(state);
+    next.betsOff = !!off;
+    pushLog(next, {
+      type: "info",
+      text: next.betsOff
+        ? "Bets Off. Place and Buy are inactive until you turn them back on."
+        : "Bets On. Place and Buy are working.",
+    });
+    return next;
+  }
+
+  /**
+   * Add `amount` of Place (or Buy) on every across number for the current rules.
+   * Stacks one selected unit per number; skips numbers the bankroll cannot cover.
+   */
+  function placeAcross(state, amount, kind) {
+    var useKind = kind === "buy" ? "buy" : "place";
+    var nums = useKind === "buy" ? buyNumbers(state) : placeNumbers(state);
+    var placed = [];
+    var skipped = [];
+    var shortfall = 0;
+    var next = state;
+    var i;
+    for (i = 0; i < nums.length; i++) {
+      var n = nums[i];
+      var spot = { kind: useKind, number: n };
+      if (amount > next.bankroll) {
+        skipped.push({ kind: useKind, number: n, reason: "Not enough bankroll." });
+        shortfall += amount;
+        continue;
+      }
+      var res = placeBet(next, spot, amount);
+      if (!res.ok) {
+        skipped.push({ kind: useKind, number: n, reason: res.error || "skipped" });
+        if (res.error === "Not enough bankroll.") shortfall += amount;
+        continue;
+      }
+      next = res.state;
+      placed.push({ kind: useKind, number: n, amount: amount });
+    }
+    return {
+      ok: true,
+      state: next,
+      placed: placed,
+      skipped: skipped,
+      shortfall: shortfall,
+      kind: useKind,
+      numbers: nums.slice(),
+    };
+  }
+
+  function isMakeEmKind(kind) {
+    return kind === "small" || kind === "tall" || kind === "all" || kind === "hardAllDay";
+  }
+
+  /**
+   * Restore the come-out layout captured on the first roll of this hand.
+   * Takes down extra removable bets, then re-posts the starting set.
+   */
+  function resetToStartingBets(state) {
+    var wagerList = state.startingWagerSet;
+    if (!wagerList || !wagerList.length) {
+      return {
+        ok: false,
+        error: "No starting bet yet. Roll once with bets up on a come-out.",
+        state: state,
+        placed: [],
+        taken: [],
+        skipped: [],
+      };
+    }
+    var next = clone(state);
+    var want = {};
+    var i;
+    for (i = 0; i < wagerList.length; i++) {
+      var w = wagerList[i];
+      want[wagerKey(w.kind, w.number)] = w.amount;
+    }
+
+    var taken = [];
+    var skipped = [];
+    var current = snapshotWagers(next);
+    for (i = 0; i < current.length; i++) {
+      var b = current[i];
+      var target = want[wagerKey(b.kind, b.number)] || 0;
+      if (b.amount <= target) continue;
+      var extra = b.amount - target;
+      var spot = { kind: b.kind, number: b.number };
+      if (!canRemove(next, spot)) {
+        skipped.push({ kind: b.kind, number: b.number, reason: "locked" });
+        continue;
+      }
+      applyBetDelta(next, spot, -extra);
+      next.bankroll += extra;
+      if (isMakeEmKind(spot.kind) && getSpotAmount(next, spot) === 0) {
+        next.progress[spot.kind] = {};
+      }
+      taken.push({ kind: b.kind, number: b.number, amount: extra });
+    }
+
+    var placed = [];
+    for (i = 0; i < wagerList.length; i++) {
+      var w2 = wagerList[i];
+      var spot2 = { kind: w2.kind, number: w2.number };
+      var have = getSpotAmount(next, spot2);
+      var need = w2.amount - have;
+      if (need <= 0) {
+        skipped.push({ kind: w2.kind, number: w2.number, reason: "already on" });
+        continue;
+      }
+      var err = validatePlace(next, spot2, need, false);
+      if (err) {
+        skipped.push({ kind: w2.kind, number: w2.number, reason: err });
+        continue;
+      }
+      var prior = have;
+      applyBetDelta(next, spot2, need);
+      if (prior === 0 && isMakeEmKind(spot2.kind)) {
+        next.progress[spot2.kind] = {};
+      }
+      next.bankroll -= need;
+      placed.push({ kind: w2.kind, number: w2.number, amount: need });
+    }
+
+    pushLog(next, { type: "bet", text: "Reset to starting bet." });
+    return { ok: true, state: next, placed: placed, taken: taken, skipped: skipped };
+  }
+
   function listActiveBets(state) {
     var list = [];
     var b = state.bets;
@@ -1310,6 +1467,10 @@
     rollDice: rollDice,
     snapshotWagers: snapshotWagers,
     repeatWagers: repeatWagers,
+    placeAcross: placeAcross,
+    setBetsOff: setBetsOff,
+    resetToStartingBets: resetToStartingBets,
+    placeBetsWorking: placeBetsWorking,
     listActiveBets: listActiveBets,
     getSpotAmount: getSpotAmount,
     spotAvailable: spotAvailable,
