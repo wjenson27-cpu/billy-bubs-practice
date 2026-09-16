@@ -317,13 +317,23 @@
           </div>
           <div class="chips" id="chips"></div>
           <p class="hint" id="chip-hint">Select a chip, then tap a bet on the layout.</p>
+          <div class="drop-off" id="drop-off" aria-label="Take down zone">
+            <span class="drop-ico" aria-hidden="true"></span>
+            <span>Drag a chip off the layout or here to take it down</span>
+          </div>
         </div>
 
-        <button type="button" class="roll-btn" id="roll-btn">
-          <span class="roll-kicker">Shoot</span>
-          <span class="roll-label">Roll</span>
-          <span class="roll-hotkey">Space</span>
-        </button>
+        <div class="shoot-row">
+          <button type="button" class="repeat-btn is-disabled" id="repeat-btn" aria-disabled="true">
+            <span class="repeat-kicker">Last bet</span>
+            <span class="repeat-label">REPEAT</span>
+          </button>
+          <button type="button" class="roll-btn" id="roll-btn">
+            <span class="roll-kicker">Shoot</span>
+            <span class="roll-label">Roll</span>
+            <span class="roll-hotkey">Space</span>
+          </button>
+        </div>
 
         <div class="panel">
           <h2>Bets on the table</h2>
@@ -440,6 +450,25 @@
                 the $20 stays up.
               </li>
             </ul>
+          </section>
+          <section>
+            <h3>Repeat last bet</h3>
+            <p>
+              <strong>REPEAT</strong> re-posts the last committed wager set — the bets that were on the layout
+              when you last rolled, or the last chips you placed. It deducts from credits, skips anything you
+              cannot afford, and skips bets that are illegal in the current phase (Pass during a point, Come
+              on the come-out, and so on). If there is nothing to put back, the button stays dim and shows
+              a short “Nothing to repeat” note.
+            </p>
+          </section>
+          <section>
+            <h3>Take a bet down</h3>
+            <p>
+              Use <strong>Take down</strong> and tap a chip, or <strong>drag the chip off the layout</strong>
+              (or onto the take-down tray). Same lock rules either way: Pass and Don't Pass stay until they
+              resolve; Come / Don't Come points cannot be picked up. Place, Buy, odds, hardways, and one-roll
+              props refund to credits when they come off.
+            </p>
           </section>
           <section>
             <h3>Other pays</h3>

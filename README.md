@@ -30,8 +30,9 @@ node tests/engine.test.js
 
 1. Stay on the green machine layout. Toggle **Regular** or **Crapless** at the top (same screen).
 2. Select a **Billy Bubs** chip ($1 / $5 / $25 / $100) and tap a bet. Chips on the tray and on the felt carry a **BB** bubble mark — practice branding, not a casino logo.
-3. **Roll** (or Space). Dice are always fair random 1–6 — no set-dice control, like a real bubble machine.
-4. **Take down** picks up removable bets.
+3. **Roll** (or Space). Each die is an independent fair 1–6 via `crypto.getRandomValues` — no set-dice, no sticky faces.
+4. **REPEAT / LAST BET** re-posts the last committed wager set (the board you last rolled, or the last chips you placed). It skips bets you cannot afford or that are illegal in this phase.
+5. **Take down** picks up removable bets, or **drag a chip off the layout** (or onto the take-down tray). Locked Pass / Don't Pass stay until they resolve.
 
 Switching rules clears the table and **keeps credits**. **New session** resets to $1,000.
 

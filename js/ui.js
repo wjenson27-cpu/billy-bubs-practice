@@ -12,8 +12,19 @@
   var selectedChip = 500;
   var takeDown = false;
   var rolling = false;
+  var lastWagerSet = [];
+  var suppressSpotClick = false;
 
   var els = {};
+  var drag = {
+    active: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    spot: null,
+    sourceChip: null,
+    ghost: null,
+  };
 
   function $(id) {
     return document.getElementById(id);
@@ -37,6 +48,7 @@
         JSON.stringify({
           state: state,
           selectedChip: selectedChip,
+          lastWagerSet: lastWagerSet,
         })
       );
     } catch (err) {
@@ -145,11 +157,15 @@
     var probeAmt = spot.kind === "horn" ? 400 : selectedChip;
     var canAdd = E.validatePlace(state, spot, probeAmt, false) == null;
     var canTake = amt > 0 && E.canRemove(state, spot);
-    el.disabled = takeDown ? !canTake : !canAdd && amt === 0;
-    if (!takeDown && amt > 0 && !canAdd) {
-      el.disabled = true;
+    // Keep chips pointer-interactive even when the spot cannot take another wager
+    // (locked Pass during a point, etc.) so they can be dragged off.
+    if (amt > 0) {
+      el.disabled = false;
+    } else {
+      el.disabled = takeDown ? true : !canAdd;
     }
-    if (takeDown && canTake) el.disabled = false;
+    el.classList.toggle("is-locked", amt > 0 && !canAdd && !takeDown);
+    el.classList.toggle("can-take", canTake);
   }
 
   function renderSpots() {
@@ -314,6 +330,7 @@
     renderLog();
     renderChips();
     els.rollBtn.disabled = rolling;
+    updateRepeatButton();
     save();
   }
 
@@ -345,12 +362,51 @@
     render();
   }
 
+  function rememberWagers() {
+    lastWagerSet = E.snapshotWagers(state);
+    updateRepeatButton();
+  }
+
+  function updateRepeatButton() {
+    if (!els.repeatBtn) return;
+    var empty = !lastWagerSet || lastWagerSet.length === 0;
+    els.repeatBtn.classList.toggle("is-disabled", empty);
+    els.repeatBtn.setAttribute("aria-disabled", empty ? "true" : "false");
+  }
+
+  function doRepeat() {
+    if (rolling) return;
+    if (!lastWagerSet || !lastWagerSet.length) {
+      toast("Nothing to repeat.", "info");
+      return;
+    }
+    var result = E.repeatWagers(state, lastWagerSet);
+    applyResult(result.state);
+    if (!result.placed.length) {
+      toast("Nothing to repeat.", "info");
+      return;
+    }
+    rememberWagers();
+    render();
+    var msg = result.placed.length === 1 ? "Repeated last bet." : "Repeated " + result.placed.length + " bets.";
+    if (result.skipped.some(function (s) { return s.reason !== "already on"; })) {
+      msg += " Skipped bets you couldn’t post.";
+    }
+    toast(msg, "info");
+  }
+
   function chipAmountFor(spot) {
     if (spot.kind === "horn") return selectedChip * 4;
     return selectedChip;
   }
 
   function onSpotClick(ev) {
+    if (suppressSpotClick) {
+      suppressSpotClick = false;
+      ev.preventDefault();
+      ev.stopPropagation();
+      return;
+    }
     var btn = ev.target.closest(".spot");
     if (!btn || btn.disabled) return;
     var spot = parseSpot(btn);
@@ -374,6 +430,7 @@
       return;
     }
     applyResult(res.state);
+    rememberWagers();
   }
 
   function confirmDialog(message, onOk) {
@@ -390,6 +447,7 @@
     if (mode === state.mode) return;
     var go = function () {
       applyResult(E.switchMode(state, mode));
+      lastWagerSet = [];
       buildNumbers();
       render();
       toast(
@@ -410,6 +468,7 @@
     if (rolling) return;
     rolling = true;
     els.rollBtn.disabled = true;
+    rememberWagers();
     var dice = E.rollDice();
     Dice.animateRoll([els.die1, els.die2], dice, 780, function () {
       var result = E.settle(state, dice.d1, dice.d2);
@@ -480,8 +539,112 @@
     });
   }
 
+  function pointInRect(x, y, rect) {
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  }
+
+  function isOffTable(x, y) {
+    if (els.dropOff && pointInRect(x, y, els.dropOff.getBoundingClientRect())) return true;
+    if (!els.table) return true;
+    return !pointInRect(x, y, els.table.getBoundingClientRect());
+  }
+
+  function endChipDrag(clientX, clientY, cancelled) {
+    var spot = drag.spot;
+    var source = drag.sourceChip;
+    var ghost = drag.ghost;
+    var moved = drag.active;
+    drag.active = false;
+    drag.pointerId = null;
+    drag.spot = null;
+    drag.sourceChip = null;
+    drag.ghost = null;
+    document.body.classList.remove("is-chip-drag");
+    if (els.dropOff) els.dropOff.classList.remove("is-hot");
+    if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+    if (source) source.classList.remove("is-source");
+    if (!moved || cancelled || !spot) return false;
+    if (!isOffTable(clientX, clientY)) return true;
+    var res = E.removeBet(state, spot, amountOn(spot));
+    if (!res.ok) {
+      toast(res.error, "lose");
+      return true;
+    }
+    applyResult(res.state);
+    toast("Took down " + E.describeSpot(spot), "info");
+    return true;
+  }
+
+  function onChipPointerDown(ev) {
+    if (rolling) return;
+    var chip = ev.target.closest(".felt-chip");
+    if (!chip) return;
+    var btn = chip.closest(".spot");
+    if (!btn) return;
+    var spot = parseSpot(btn);
+    if (!spot.kind) return;
+    if (ev.pointerType === "mouse" && ev.button !== 0) return;
+    drag.pointerId = ev.pointerId;
+    drag.startX = ev.clientX;
+    drag.startY = ev.clientY;
+    drag.spot = spot;
+    drag.sourceChip = chip;
+    drag.active = false;
+    drag.ghost = null;
+    try {
+      chip.setPointerCapture(ev.pointerId);
+    } catch (err) {
+      /* ignore */
+    }
+  }
+
+  function onChipPointerMove(ev) {
+    if (drag.pointerId !== ev.pointerId || !drag.spot) return;
+    var dx = ev.clientX - drag.startX;
+    var dy = ev.clientY - drag.startY;
+    if (!drag.active) {
+      if (dx * dx + dy * dy < 64) return;
+      drag.active = true;
+      document.body.classList.add("is-chip-drag");
+      if (drag.sourceChip) drag.sourceChip.classList.add("is-source");
+      var ghost = document.createElement("div");
+      ghost.className = "chip-ghost";
+      ghost.innerHTML = drag.sourceChip ? drag.sourceChip.outerHTML : "";
+      document.body.appendChild(ghost);
+      drag.ghost = ghost;
+    }
+    if (drag.ghost) {
+      drag.ghost.style.left = ev.clientX + "px";
+      drag.ghost.style.top = ev.clientY + "px";
+    }
+    if (els.dropOff) {
+      els.dropOff.classList.toggle("is-hot", isOffTable(ev.clientX, ev.clientY));
+    }
+    ev.preventDefault();
+  }
+
+  function onChipPointerUp(ev) {
+    if (drag.pointerId !== ev.pointerId) return;
+    var wasDrag = drag.active;
+    var removed = endChipDrag(ev.clientX, ev.clientY, false);
+    if (wasDrag || removed) {
+      suppressSpotClick = true;
+      ev.preventDefault();
+    }
+  }
+
+  function onChipPointerCancel(ev) {
+    if (drag.pointerId !== ev.pointerId) return;
+    endChipDrag(ev.clientX, ev.clientY, true);
+    suppressSpotClick = true;
+  }
+
   function bind() {
     document.body.addEventListener("click", onSpotClick);
+    document.body.addEventListener("pointerdown", onChipPointerDown);
+    document.body.addEventListener("pointermove", onChipPointerMove);
+    document.body.addEventListener("pointerup", onChipPointerUp);
+    document.body.addEventListener("pointercancel", onChipPointerCancel);
 
     document.querySelectorAll(".mode-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -500,6 +663,7 @@
       renderSpots();
     });
     els.rollBtn.addEventListener("click", doRoll);
+    els.repeatBtn.addEventListener("click", doRepeat);
     window.addEventListener("keydown", function (ev) {
       if (ev.code !== "Space") return;
       if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "BUTTON" || ev.target.tagName === "TEXTAREA")) return;
@@ -524,6 +688,7 @@
     els.btnReset.addEventListener("click", function () {
       confirmDialog("Reset bankroll to $1,000 and clear this session?", function () {
         applyResult(E.resetSession(state, true));
+        lastWagerSet = [];
         buildNumbers();
         render();
         toast("New session. Good luck — it's only practice.", "info");
@@ -548,6 +713,9 @@
     els.btnAdd = $("btn-add");
     els.btnTake = $("btn-take");
     els.rollBtn = $("roll-btn");
+    els.repeatBtn = $("repeat-btn");
+    els.dropOff = $("drop-off");
+    els.table = $("table");
     els.betList = $("bet-list");
     els.stats = $("stats");
     els.log = $("log");
@@ -568,8 +736,10 @@
     if (saved && saved.state && saved.state.bets) {
       state = E.normalizeState(saved.state);
       selectedChip = saved.selectedChip || 500;
+      lastWagerSet = Array.isArray(saved.lastWagerSet) ? saved.lastWagerSet : E.snapshotWagers(state);
     } else {
       state = E.createGame();
+      lastWagerSet = [];
     }
     buildChips();
     buildNumbers();

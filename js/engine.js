@@ -1130,11 +1130,85 @@
     return { state: next, decisions: decisions, narrative: narrative, dice: next.lastDice };
   }
 
+  function getRandomCrypto() {
+    if (typeof globalThis !== "undefined" && globalThis.crypto && globalThis.crypto.getRandomValues) {
+      return globalThis.crypto;
+    }
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      return crypto;
+    }
+    if (typeof require === "function") {
+      try {
+        var nodeCrypto = require("crypto");
+        if (nodeCrypto.webcrypto && nodeCrypto.webcrypto.getRandomValues) return nodeCrypto.webcrypto;
+      } catch (err) {
+        /* browser */
+      }
+    }
+    return null;
+  }
+
+  /** One independent fair 1–6. Optional rng() is only for tests; live rolls use crypto. */
+  function rollDie(rng) {
+    if (typeof rng === "function") {
+      return Math.floor(rng() * 6) + 1;
+    }
+    var c = getRandomCrypto();
+    if (c) {
+      var buf = new Uint32Array(1);
+      var limit = 4294967296 - (4294967296 % 6);
+      var n;
+      do {
+        c.getRandomValues(buf);
+        n = buf[0];
+      } while (n >= limit);
+      return (n % 6) + 1;
+    }
+    return Math.floor(Math.random() * 6) + 1;
+  }
+
   function rollDice(rng) {
-    rng = rng || Math.random;
-    var d1 = Math.floor(rng() * 6) + 1;
-    var d2 = Math.floor(rng() * 6) + 1;
+    var d1 = rollDie(rng);
+    var d2 = rollDie(rng);
     return { d1: d1, d2: d2, total: d1 + d2, hard: d1 === d2 };
+  }
+
+  function snapshotWagers(state) {
+    return listActiveBets(state)
+      .filter(function (b) {
+        return b.kind !== "comePoint" && b.kind !== "dontComePoint";
+      })
+      .map(function (b) {
+        return { kind: b.kind, number: b.number, amount: b.amount };
+      });
+  }
+
+  function repeatWagers(state, wagerList) {
+    var placed = [];
+    var skipped = [];
+    if (!wagerList || !wagerList.length) {
+      return { ok: true, state: state, placed: placed, skipped: skipped };
+    }
+    var next = state;
+    var i;
+    for (i = 0; i < wagerList.length; i++) {
+      var w = wagerList[i];
+      var spot = { kind: w.kind, number: w.number };
+      var current = getSpotAmount(next, spot);
+      var need = w.amount - current;
+      if (need <= 0) {
+        skipped.push({ kind: w.kind, number: w.number, reason: "already on" });
+        continue;
+      }
+      var res = placeBet(next, spot, need);
+      if (!res.ok) {
+        skipped.push({ kind: w.kind, number: w.number, reason: res.error || "skipped" });
+        continue;
+      }
+      next = res.state;
+      placed.push({ kind: w.kind, number: w.number, amount: need });
+    }
+    return { ok: true, state: next, placed: placed, skipped: skipped };
   }
 
   function listActiveBets(state) {
@@ -1232,7 +1306,10 @@
     resetSession: resetSession,
     switchMode: switchMode,
     settle: settle,
+    rollDie: rollDie,
     rollDice: rollDice,
+    snapshotWagers: snapshotWagers,
+    repeatWagers: repeatWagers,
     listActiveBets: listActiveBets,
     getSpotAmount: getSpotAmount,
     spotAvailable: spotAvailable,
