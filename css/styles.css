@@ -1288,9 +1288,11 @@ input {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
 }
 .history-rail {
   display: flex;
@@ -1922,7 +1924,6 @@ body.is-take .spot:not(:disabled) {
   [data-rules="crapless"] .numbers {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .make-em,
   .pass-row,
   [data-rules="crapless"] .pass-row,
   .come-band,
@@ -1978,6 +1979,48 @@ body.is-take .spot:not(:disabled) {
 }
 
 @media (max-width: 560px) {
+  .make-em {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .make-em .make-spot {
+    min-height: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px 8px;
+    padding: 4px 8px 5px;
+    text-align: left;
+  }
+  .make-em .lamps {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    margin: 0;
+    gap: 2px;
+  }
+  .make-em .make-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    margin-right: auto;
+  }
+  .make-em .for-pay {
+    font-size: 0.78rem;
+  }
+  .make-em .lamp {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.55rem;
+  }
+  .make-em .spot-amt {
+    min-height: 0;
+  }
+  .make-em .has-bet .spot-amt {
+    margin-top: 0;
+    margin-left: auto;
+  }
   .brand h1 {
     font-size: 1.15rem;
   }
