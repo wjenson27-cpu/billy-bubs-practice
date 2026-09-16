@@ -103,6 +103,12 @@
     if (state.betsOff == null) state.betsOff = false;
     if (!Array.isArray(state.startingWagerSet)) state.startingWagerSet = [];
     if (state.startingBetLocked == null) state.startingBetLocked = false;
+    if (Array.isArray(state.history)) {
+      state.history.forEach(function (h) {
+        if (!h || h.hard != null) return;
+        if (h.d1 && h.d2) h.hard = h.d1 === h.d2;
+      });
+    }
     return state;
   }
 
@@ -750,7 +756,7 @@
 
     next.stats.rolls += 1;
     next.lastDice = { d1: d1, d2: d2, total: total, hard: hard };
-    next.history.unshift({ d1: d1, d2: d2, total: total });
+    next.history.unshift({ d1: d1, d2: d2, total: total, hard: hard });
     if (next.history.length > 16) next.history.length = 16;
 
     if (next.bets.any7) {

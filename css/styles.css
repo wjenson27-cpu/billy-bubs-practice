@@ -160,6 +160,7 @@ input {
 .point-readout .k,
 .roll-kicker,
 .history-strip .k,
+.last-roll .k,
 .min-bet-line {
   font-size: 0.64rem;
   letter-spacing: 0.14em;
@@ -706,6 +707,148 @@ input {
   display: block;
 }
 
+.last-roll {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(4, 18, 8, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.last-roll .k {
+  flex-shrink: 0;
+  color: #d9ffe6;
+}
+.last-roll-body {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+.last-roll-empty {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.last-roll-dice {
+  display: flex;
+  gap: 6px;
+}
+.roll-die,
+.hist-die {
+  display: inline-block;
+  background-color: #fff;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.22);
+  position: relative;
+  flex-shrink: 0;
+}
+.roll-die {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+}
+.hist-die {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+}
+.roll-die[data-face="1"],
+.hist-die[data-face="1"],
+.hw-die[data-face="1"] {
+  background-image: radial-gradient(circle at 50% 50%, #151515 12%, transparent 13.5%);
+}
+.roll-die[data-face="2"],
+.hist-die[data-face="2"],
+.hw-die[data-face="2"] {
+  background-image:
+    radial-gradient(circle at 28% 28%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 72% 72%, #151515 11%, transparent 12.5%);
+}
+.roll-die[data-face="3"],
+.hist-die[data-face="3"],
+.hw-die[data-face="3"] {
+  background-image:
+    radial-gradient(circle at 26% 26%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 50% 50%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 74% 74%, #151515 11%, transparent 12.5%);
+}
+.roll-die[data-face="4"],
+.hist-die[data-face="4"],
+.hw-die[data-face="4"] {
+  background-image:
+    radial-gradient(circle at 28% 28%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 72% 28%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 28% 72%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 72% 72%, #151515 11%, transparent 12.5%);
+}
+.roll-die[data-face="5"],
+.hist-die[data-face="5"],
+.hw-die[data-face="5"] {
+  background-image:
+    radial-gradient(circle at 28% 28%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 72% 28%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 50% 50%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 28% 72%, #151515 11%, transparent 12.5%),
+    radial-gradient(circle at 72% 72%, #151515 11%, transparent 12.5%);
+}
+.roll-die[data-face="6"],
+.hist-die[data-face="6"],
+.hw-die[data-face="6"] {
+  background-image:
+    radial-gradient(circle at 28% 22%, #151515 10%, transparent 11.5%),
+    radial-gradient(circle at 28% 50%, #151515 10%, transparent 11.5%),
+    radial-gradient(circle at 28% 78%, #151515 10%, transparent 11.5%),
+    radial-gradient(circle at 72% 22%, #151515 10%, transparent 11.5%),
+    radial-gradient(circle at 72% 50%, #151515 10%, transparent 11.5%),
+    radial-gradient(circle at 72% 78%, #151515 10%, transparent 11.5%);
+}
+.last-roll-read {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.last-roll-read strong {
+  font-family: var(--display);
+  font-size: 1.55rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #fff;
+}
+.last-roll-eq {
+  font-family: var(--display);
+  font-size: 1.7rem;
+  letter-spacing: 0.04em;
+  color: #d9ffe6;
+  text-shadow: 0 0 10px rgba(80, 255, 140, 0.45);
+}
+.last-roll.is-seven .last-roll-eq {
+  color: #ffd0d0;
+  text-shadow: 0 0 10px rgba(255, 60, 40, 0.45);
+}
+.last-roll.is-craps .last-roll-eq {
+  color: #ffe08a;
+}
+.hard-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffe566;
+  color: #1a1406;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.last-roll.has-roll.is-hard {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(255, 229, 102, 0.55);
+}
+
 .spot {
   appearance: none;
   border: 1px solid var(--line);
@@ -1143,7 +1286,7 @@ input {
 
 .history-strip {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-top: 10px;
   padding-top: 8px;
@@ -1151,19 +1294,41 @@ input {
 }
 .history-rail {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 .hist {
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
-  display: grid;
-  place-items: center;
+  min-width: 48px;
+  width: auto;
+  height: auto;
+  padding: 4px 5px 3px;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
   font-size: 0.7rem;
   font-weight: 700;
   background: #fff;
   color: #127a30;
+}
+.hist-dice {
+  display: flex;
+  gap: 2px;
+}
+.hist-faces {
+  font-size: 0.58rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  opacity: 0.9;
+}
+.hist-total {
+  font-family: var(--display);
+  font-size: 0.92rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
 }
 .hist.is-seven {
   background: #c81e1e;
@@ -1172,6 +1337,9 @@ input {
 .hist.is-craps {
   background: #c9a24a;
   color: #1a1406;
+}
+.hist.is-hard {
+  box-shadow: 0 0 0 2px #ffe566;
 }
 
 .console {
@@ -1778,6 +1946,34 @@ body.is-take .spot:not(:disabled) {
   }
   .machine-keys {
     bottom: 92px;
+  }
+  .last-roll {
+    position: sticky;
+    top: 8px;
+    z-index: 12;
+    padding: 6px 8px;
+    gap: 8px;
+    background: rgba(6, 28, 12, 0.94);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
+  }
+  .last-roll .k {
+    max-width: 3.4rem;
+    line-height: 1.15;
+  }
+  .roll-die {
+    width: 34px;
+    height: 34px;
+  }
+  .hist-die {
+    width: 22px;
+    height: 22px;
+  }
+  .hist {
+    min-width: 54px;
+    padding: 5px 6px 4px;
+  }
+  .hist-faces {
+    font-size: 0.64rem;
   }
 }
 

@@ -233,21 +233,106 @@
     if (!state.lastDice) {
       els.diceTotal.textContent = "";
       els.diceTotal.classList.add("is-empty");
+      paintLastRoll(null);
       return;
     }
     els.diceTotal.classList.remove("is-empty");
     els.diceTotal.textContent = String(d.total != null ? d.total : state.lastDice.total);
+    paintLastRoll(d);
+  }
+
+  function pipDieHtml(face, extraClass) {
+    var n = Number(face);
+    if (n < 1 || n > 6) n = 1;
+    return (
+      '<span class="' +
+      (extraClass || "roll-die") +
+      '" data-face="' +
+      n +
+      '" aria-hidden="true"></span>'
+    );
+  }
+
+  function isHardCombo(d) {
+    if (!d) return false;
+    if (d.hard != null) return !!d.hard;
+    return d.d1 > 0 && d.d1 === d.d2;
+  }
+
+  function paintLastRoll(d) {
+    if (!els.lastRollBody) return;
+    if (!d || !d.d1 || !d.d2) {
+      els.lastRollBody.className = "last-roll-body is-empty";
+      els.lastRollBody.innerHTML = '<span class="last-roll-empty">Roll to see the combo on the felt</span>';
+      if (els.lastRoll) {
+        els.lastRoll.classList.remove("is-seven", "is-craps", "is-hard", "has-roll");
+        els.lastRoll.removeAttribute("aria-label");
+      }
+      return;
+    }
+    var total = d.total != null ? d.total : d.d1 + d.d2;
+    var hard = isHardCombo(d);
+    var tone = "";
+    if (total === 7) tone = " is-seven";
+    else if (total === 2 || total === 3 || total === 12) tone = " is-craps";
+    els.lastRollBody.className = "last-roll-body";
+    els.lastRollBody.innerHTML =
+      '<span class="last-roll-dice">' +
+      pipDieHtml(d.d1, "roll-die") +
+      pipDieHtml(d.d2, "roll-die") +
+      "</span>" +
+      '<span class="last-roll-read">' +
+      "<strong>" +
+      d.d1 +
+      "–" +
+      d.d2 +
+      "</strong>" +
+      '<span class="last-roll-eq">= ' +
+      total +
+      "</span>" +
+      "</span>" +
+      (hard ? '<span class="hard-tag">Hard</span>' : "");
+    if (els.lastRoll) {
+      els.lastRoll.className = "last-roll has-roll" + tone + (hard ? " is-hard" : "");
+      els.lastRoll.setAttribute(
+        "aria-label",
+        "Last roll " + d.d1 + " and " + d.d2 + " equals " + total + (hard ? ", hard" : "")
+      );
+    }
   }
 
   function renderHistory() {
     els.history.innerHTML = state.history
       .slice(0, 12)
       .map(function (h) {
+        var d1 = h.d1 || 0;
+        var d2 = h.d2 || 0;
+        var total = h.total != null ? h.total : d1 + d2;
+        var hard = isHardCombo(h);
         var cls = "hist";
-        if (h.total === 7) cls += " is-seven";
-        else if (h.total === 2 || h.total === 3 || h.total === 12) cls += " is-craps";
+        if (total === 7) cls += " is-seven";
+        else if (total === 2 || total === 3 || total === 12) cls += " is-craps";
         else cls += " is-point";
-        return '<span class="' + cls + '">' + h.total + "</span>";
+        if (hard) cls += " is-hard";
+        var faces = d1 && d2 ? d1 + "–" + d2 : "";
+        var dice =
+          d1 && d2
+            ? '<span class="hist-dice">' + pipDieHtml(d1, "hist-die") + pipDieHtml(d2, "hist-die") + "</span>"
+            : "";
+        return (
+          '<span class="' +
+          cls +
+          '" title="' +
+          (faces ? faces + " = " : "") +
+          total +
+          (hard ? " hard" : "") +
+          '">' +
+          dice +
+          (faces ? '<span class="hist-faces">' + faces + "</span>" : "") +
+          '<span class="hist-total">' +
+          total +
+          "</span></span>"
+        );
       })
       .join("");
   }
@@ -564,6 +649,7 @@
     els.rollBtn.disabled = true;
     rememberWagers();
     var dice = E.rollDice();
+    paintLastRoll(dice);
     Dice.animateRoll([els.die1, els.die2], dice, 780, function () {
       var result = E.settle(state, dice.d1, dice.d2);
       rolling = false;
@@ -802,6 +888,8 @@
     els.die1 = $("die1");
     els.die2 = $("die2");
     els.diceTotal = $("dice-total");
+    els.lastRoll = $("last-roll");
+    els.lastRollBody = $("last-roll-body");
     els.history = $("history-rail");
     els.bankroll = $("bankroll");
     els.onTable = $("on-table");
