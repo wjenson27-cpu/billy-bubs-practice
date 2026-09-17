@@ -33,7 +33,7 @@ node tests/engine.test.js
 3. **Roll** (or Space). Each die is an independent fair 1–6 via `crypto.getRandomValues` — no set-dice, no sticky faces. The **last-roll bar** on the felt shows both faces and the total (e.g. 3–4 = 7) so you can still see the combo when the bubble is scrolled away. Matching dice are marked Hard. The **last-rolls rail** sits under Repeat / Roll and stores each combo, not just the total. Big Red never shows seven-dice art. On a **phone**, Low Rolls / Roll ’Em All / High Rolls shrink into a **3×1 stack** so they stop eating the top of the felt. Hard Way All Day stays between Come and Don't Come.
 4. **REPEAT / LAST BET** re-posts the last committed wager set (the board you last rolled, or the last chips you placed). It skips bets you cannot afford or that are illegal in this phase.
 5. **BETS OFF** parks Place and Buy so they neither win nor lose on 7 / number hits until you turn them back on. Pass, Come, Field, and props still work.
-6. **ACROSS** adds the selected chip as Place (or Buy, if that was your last number bet) on every across number for the current rules. Each press stacks one unit; numbers you cannot afford are skipped.
+6. **BILLY’S WAY** Buys the selected chip on 2, 3, 4, 5, 9, 10, 11, 12 (whichever the current rules offer) and Places chip × 6/5 on 6 and 8. Each press stacks one unit; numbers you cannot afford are skipped.
 7. **RESET** restores the starting bet — the layout snapshotted on the first come-out roll with bets up this hand. Distinct from Repeat (previous roll).
 8. **Take down** picks up removable bets, or **drag a chip off the layout** (or onto the take-down tray). Locked Pass / Don't Pass stay until they resolve.
 
@@ -111,7 +111,7 @@ Each point number has **Buy above** the number and **Place below**. Both stay af
 
 **Buy vig:** 5% of the buy stake, **taken on a win only**. Not charged when you post the bet, and not charged if a 7 takes it down. Example: $20 Buy 4 pays $40 true odds minus $1 vig → **$39 profit**; the $20 stays up.
 
-**Bets Off** covers Place and Buy only. **Across** posts the selected chip on Regular 4, 5, 6, 8, 9, 10 (Crapless also 2, 3, 11, 12), stacking one unit per press. **Reset to starting bet** remembers the first come-out layout of the hand (captured when that come-out is rolled with bets up) and restores it.
+**Bets Off** covers Place and Buy only. **Billy’s Way** Buys the selected chip on 2, 3, 4, 5, 9, 10, 11, 12 when those spots exist (Regular: 4, 5, 9, 10; Crapless adds 2, 3, 11, 12) and Places chip × 6/5 on 6 and 8, stacking one unit per press. **Hand rolls** counts rolls in the current shooter hand and resets after seven-out. **Reset to starting bet** remembers the first come-out layout of the hand (captured when that come-out is rolled with bets up) and restores it.
 
 ## Other live bets
 

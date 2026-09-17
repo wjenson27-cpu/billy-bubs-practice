@@ -53,7 +53,9 @@
             <div class="bubble-ambient" aria-hidden="true"></div>
             <div class="bubble-column">
               <div class="bubble-hood" aria-hidden="true">
-                <div class="hood-dome"></div>
+                <div class="hood-dome">
+                  <span class="hood-mark" data-text="BillyBubs"><span class="hood-mark-face">BillyBubs</span></span>
+                </div>
                 <svg class="hood-scallop" viewBox="0 0 240 56" preserveAspectRatio="none">
                   <path
                     d="M0 0 H240 V6
@@ -135,6 +137,10 @@
                 <div class="point-readout">
                   <span class="k" id="phase-label">Come-out</span>
                   <strong id="point-label">No point</strong>
+                </div>
+                <div class="hand-rolls" id="hand-rolls" title="Rolls this shooter hand (resets after seven-out)">
+                  <span class="k">Hand rolls</span>
+                  <strong id="hand-rolls-count">0</strong>
                 </div>
               </div>
               <div class="rules-pill" id="rules-pill">Regular rules</div>
@@ -331,9 +337,9 @@
             <span class="key-kicker" id="bets-off-kicker">Working</span>
             <span class="key-label">BETS OFF</span>
           </button>
-          <button type="button" class="machine-key across-btn" id="across-btn">
-            <span class="key-kicker" id="across-kicker">Place $5</span>
-            <span class="key-label">ACROSS</span>
+          <button type="button" class="machine-key across-btn" id="across-btn" title="Billy’s Way — Buy 2,3,4,5,9,10,11,12; Place 6 and 8 at chip × 6/5" aria-label="Billy’s Way">
+            <span class="key-kicker" id="across-kicker">Buy $5 · 6/8 $6</span>
+            <span class="key-label">BILLY’S WAY</span>
           </button>
           <button type="button" class="machine-key start-bet-btn is-disabled" id="start-bet-btn" aria-disabled="true">
             <span class="key-kicker">Starting bet</span>
@@ -346,6 +352,10 @@
             <span class="repeat-kicker">Last bet</span>
             <span class="repeat-label">REPEAT</span>
           </button>
+          <div class="hand-rolls-shoot" id="hand-rolls-shoot" title="Rolls this shooter hand" aria-live="polite">
+            <span class="k">Hand</span>
+            <strong id="hand-rolls-count-shoot">0</strong>
+          </div>
           <button type="button" class="roll-btn" id="roll-btn">
             <span class="roll-kicker">Shoot</span>
             <span class="roll-label">Roll</span>
@@ -489,15 +499,16 @@
             </ul>
           </section>
           <section>
-            <h3>Across</h3>
+            <h3>Billy’s Way</h3>
             <p>
-              <strong>ACROSS</strong> posts the <strong>selected chip</strong> on every across number using
-              Place — or Buy if your last number bet was a Buy. Regular across is 4, 5, 6, 8, 9, 10.
-              Crapless also includes 2, 3, 11, and 12.
+              <strong>BILLY’S WAY</strong> (renamed from Across) posts the <strong>selected chip</strong> as
+              <strong>Buy</strong> on 2, 3, 4, 5, 9, 10, 11, and 12 (whichever your rules offer — Crapless
+              includes 2/3/11/12; Regular buys 4, 5, 9, 10), and <strong>Place</strong> on 6 and 8 at
+              <strong>chip × 6/5</strong> (e.g. $5 chip → Buy $5 on the buys, Place $6 on 6 and on 8).
             </p>
             <p>
-              Each press <strong>adds one chip unit per number</strong> (it stacks; it does not top-up to a
-              cap). Numbers you cannot afford are skipped. A toast lists what posted and any shortfall.
+              Each press <strong>stacks one unit</strong> on those spots. Numbers you cannot afford are
+              skipped. A toast lists what posted and any shortfall.
             </p>
           </section>
           <section>

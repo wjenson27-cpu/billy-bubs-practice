@@ -103,6 +103,7 @@
     if (state.betsOff == null) state.betsOff = false;
     if (!Array.isArray(state.startingWagerSet)) state.startingWagerSet = [];
     if (state.startingBetLocked == null) state.startingBetLocked = false;
+    if (state.handRolls == null || state.handRolls < 0) state.handRolls = 0;
     if (Array.isArray(state.history)) {
       state.history.forEach(function (h) {
         if (!h || h.hard != null) return;
@@ -126,6 +127,7 @@
       betsOff: false,
       startingWagerSet: [],
       startingBetLocked: false,
+      handRolls: 0,
       lastDice: null,
       progress: emptyProgress(),
       history: [],
@@ -655,6 +657,7 @@
     next.betsOff = false;
     next.startingWagerSet = [];
     next.startingBetLocked = false;
+    next.handRolls = 0;
     pushLog(next, {
       type: "info",
       text:
@@ -755,6 +758,7 @@
     }
 
     next.stats.rolls += 1;
+    next.handRolls = (next.handRolls || 0) + 1;
     next.lastDice = { d1: d1, d2: d2, total: total, hard: hard };
     next.history.unshift({ d1: d1, d2: d2, total: total, hard: hard });
     if (next.history.length > 16) next.history.length = 16;
@@ -1117,6 +1121,7 @@
       next.bets.passOdds = 0;
       next.bets.dontPassOdds = 0;
       next.startingBetLocked = false;
+      next.handRolls = 0;
       narrative = "Seven-out. Line down. Puck OFF.";
     } else if (total === point) {
       if (next.bets.pass) {
@@ -1257,43 +1262,83 @@
     return next;
   }
 
+  /** Buy targets for Billy's Way (6 and 8 are Place instead). */
+  var BILLYS_WAY_BUY = [2, 3, 4, 5, 9, 10, 11, 12];
+  var BILLYS_WAY_PLACE = [6, 8];
+
+  /** Buy stake = selected chip. Place 6/8 stake = chip × 6/5 (cents). */
+  function billysWayBuyStake(chipCents) {
+    var chip = Number(chipCents) || 0;
+    return chip > 0 ? chip : 0;
+  }
+
+  function billysWayPlace68Stake(chipCents) {
+    var buy = billysWayBuyStake(chipCents);
+    if (buy <= 0) return 0;
+    return Math.floor((buy * 6) / 5);
+  }
+
+  /** Available Buy numbers for Billy's Way under current rules. */
+  function billysWayBuyNumbers(state) {
+    var allowed = buyNumbers(state);
+    return BILLYS_WAY_BUY.filter(function (n) {
+      return allowed.indexOf(n) !== -1;
+    });
+  }
+
   /**
-   * Add `amount` of Place (or Buy) on every across number for the current rules.
-   * Stacks one selected unit per number; skips numbers the bankroll cannot cover.
+   * Billy's Way: Buy 2,3,4,5,9,10,11,12 (whichever the mode offers) at chip size;
+   * Place 6 and 8 at chip × 6/5. Stacks one unit per press; skips what bankroll cannot cover.
    */
-  function placeAcross(state, amount, kind) {
-    var useKind = kind === "buy" ? "buy" : "place";
-    var nums = useKind === "buy" ? buyNumbers(state) : placeNumbers(state);
+  function placeBillysWay(state, chipCents) {
+    var buyAmt = billysWayBuyStake(chipCents);
+    var placeAmt = billysWayPlace68Stake(chipCents);
+    var buyNums = billysWayBuyNumbers(state);
+    var placeNums = BILLYS_WAY_PLACE.slice();
     var placed = [];
     var skipped = [];
     var shortfall = 0;
     var next = state;
     var i;
-    for (i = 0; i < nums.length; i++) {
-      var n = nums[i];
-      var spot = { kind: useKind, number: n };
+
+    function trySpot(kind, n, amount) {
+      var spot = { kind: kind, number: n };
+      if (amount <= 0) {
+        skipped.push({ kind: kind, number: n, reason: "Invalid amount." });
+        return;
+      }
       if (amount > next.bankroll) {
-        skipped.push({ kind: useKind, number: n, reason: "Not enough bankroll." });
+        skipped.push({ kind: kind, number: n, reason: "Not enough bankroll." });
         shortfall += amount;
-        continue;
+        return;
       }
       var res = placeBet(next, spot, amount);
       if (!res.ok) {
-        skipped.push({ kind: useKind, number: n, reason: res.error || "skipped" });
+        skipped.push({ kind: kind, number: n, reason: res.error || "skipped" });
         if (res.error === "Not enough bankroll.") shortfall += amount;
-        continue;
+        return;
       }
       next = res.state;
-      placed.push({ kind: useKind, number: n, amount: amount });
+      placed.push({ kind: kind, number: n, amount: amount });
     }
+
+    for (i = 0; i < buyNums.length; i++) {
+      trySpot("buy", buyNums[i], buyAmt);
+    }
+    for (i = 0; i < placeNums.length; i++) {
+      trySpot("place", placeNums[i], placeAmt);
+    }
+
     return {
       ok: true,
       state: next,
       placed: placed,
       skipped: skipped,
       shortfall: shortfall,
-      kind: useKind,
-      numbers: nums.slice(),
+      buyAmount: buyAmt,
+      placeAmount: placeAmt,
+      buyNumbers: buyNums.slice(),
+      placeNumbers: placeNums.slice(),
     };
   }
 
@@ -1473,7 +1518,10 @@
     rollDice: rollDice,
     snapshotWagers: snapshotWagers,
     repeatWagers: repeatWagers,
-    placeAcross: placeAcross,
+    billysWayBuyNumbers: billysWayBuyNumbers,
+    billysWayBuyStake: billysWayBuyStake,
+    billysWayPlace68Stake: billysWayPlace68Stake,
+    placeBillysWay: placeBillysWay,
     setBetsOff: setBetsOff,
     resetToStartingBets: resetToStartingBets,
     placeBetsWorking: placeBetsWorking,

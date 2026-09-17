@@ -357,6 +357,8 @@
     els.stats.innerHTML =
       "<div><dt>Rolls</dt><dd>" +
       s.rolls +
+      "</dd></div><div><dt>This hand</dt><dd>" +
+      (state.handRolls || 0) +
       "</dd></div><div><dt>Winning bets</dt><dd>" +
       s.wins +
       "</dd></div><div><dt>Losing bets</dt><dd>" +
@@ -475,8 +477,16 @@
       if (els.betsOffKicker) els.betsOffKicker.textContent = off ? "OFF" : "Working";
     }
     if (els.acrossKicker) {
-      var kindLabel = acrossKind === "buy" ? "Buy" : "Place";
-      els.acrossKicker.textContent = kindLabel + " " + formatMoney(selectedChip);
+      var buyStake = E.billysWayBuyStake(selectedChip);
+      var placeStake = E.billysWayPlace68Stake(selectedChip);
+      els.acrossKicker.textContent =
+        "Buy " + formatMoney(buyStake) + " · 6/8 " + formatMoney(placeStake);
+    }
+    if (els.handRollsCount) {
+      els.handRollsCount.textContent = String(state.handRolls || 0);
+    }
+    if (els.handRollsCountShoot) {
+      els.handRollsCountShoot.textContent = String(state.handRolls || 0);
     }
     if (els.startBetBtn) {
       var hasStart = !!(state.startingWagerSet && state.startingWagerSet.length);
@@ -497,24 +507,36 @@
     );
   }
 
-  function doAcross() {
+  function doBillysWay() {
     if (rolling) return;
-    var kind = acrossKind === "buy" ? "buy" : "place";
-    var result = E.placeAcross(state, selectedChip, kind);
+    var buyStake = E.billysWayBuyStake(selectedChip);
+    var placeStake = E.billysWayPlace68Stake(selectedChip);
+    var result = E.placeBillysWay(state, selectedChip);
     applyResult(result.state);
     if (!result.placed.length) {
-      toast("Couldn’t place across — not enough credits.", "lose");
+      toast("Couldn’t place Billy’s Way — not enough credits.", "lose");
       return;
     }
     rememberWagers();
     render();
-    var nums = result.placed
+    var buys = result.placed
+      .filter(function (p) {
+        return p.kind === "buy";
+      })
       .map(function (p) {
         return p.number;
+      });
+    var places = result.placed
+      .filter(function (p) {
+        return p.kind === "place";
       })
-      .join(", ");
-    var kindLabel = kind === "buy" ? "Buy" : "Place";
-    var msg = "Across: " + kindLabel + " " + formatMoney(selectedChip) + " on " + nums + ".";
+      .map(function (p) {
+        return p.number;
+      });
+    var parts = [];
+    if (buys.length) parts.push("Buy " + formatMoney(buyStake) + " on " + buys.join(", "));
+    if (places.length) parts.push("Place " + formatMoney(placeStake) + " on " + places.join(", "));
+    var msg = "Billy’s Way: " + parts.join("; ") + ".";
     if (result.skipped.length) {
       var totalNums = result.placed.length + result.skipped.length;
       msg +=
@@ -846,7 +868,7 @@
     els.rollBtn.addEventListener("click", doRoll);
     els.repeatBtn.addEventListener("click", doRepeat);
     els.betsOffBtn.addEventListener("click", doBetsOff);
-    els.acrossBtn.addEventListener("click", doAcross);
+    els.acrossBtn.addEventListener("click", doBillysWay);
     els.startBetBtn.addEventListener("click", doResetStarting);
     window.addEventListener("keydown", function (ev) {
       if (ev.code !== "Space") return;
@@ -904,6 +926,8 @@
     els.betsOffKicker = $("bets-off-kicker");
     els.acrossBtn = $("across-btn");
     els.acrossKicker = $("across-kicker");
+    els.handRollsCount = $("hand-rolls-count");
+    els.handRollsCountShoot = $("hand-rolls-count-shoot");
     els.startBetBtn = $("start-bet-btn");
     els.dropOff = $("drop-off");
     els.table = $("table");
