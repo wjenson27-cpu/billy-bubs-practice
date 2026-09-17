@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,500&family=Oswald:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,500&family=Great+Vibes&family=Oswald:wght@400;500;600;700&display=swap");
 
 :root {
   --felt: #19a63f;
@@ -233,11 +233,14 @@ input {
   height: 72px;
   border-radius: 50% 50% 18px 18px / 86% 86% 14% 14%;
   background:
-    radial-gradient(ellipse at 32% 18%, rgba(255, 190, 170, 0.28), transparent 42%),
+    radial-gradient(ellipse at 32% 18%, rgba(255, 210, 200, 0.42), transparent 42%),
+    radial-gradient(ellipse at 50% 70%, rgba(255, 60, 80, 0.28), transparent 55%),
     radial-gradient(120% 90% at 50% -10%, #e24a45, #c21c28 42%, #8a121c 78%, #5c0c12);
   box-shadow:
-    inset 0 10px 12px rgba(255, 210, 200, 0.22),
+    inset 0 10px 12px rgba(255, 220, 210, 0.28),
     inset 0 -8px 10px rgba(60, 0, 8, 0.35),
+    0 0 14px rgba(255, 50, 70, 0.55),
+    0 0 32px rgba(255, 20, 55, 0.32),
     0 8px 0 #6a1016;
 }
 .hood-monogram {
@@ -256,6 +259,7 @@ input {
   letter-spacing: 0;
   pointer-events: none;
   user-select: none;
+  filter: drop-shadow(0 0 6px rgba(255, 70, 90, 0.55));
 }
 .bb-letter {
   position: absolute;
@@ -263,28 +267,58 @@ input {
   left: 50%;
   font-weight: 700;
   line-height: 0.85;
-  color: #f6e7d4;
-  -webkit-text-stroke: 0.04em rgba(42, 4, 10, 0.92);
+  color: #fff6ec;
+  -webkit-text-stroke: 0.028em rgba(255, 90, 110, 0.55);
+  paint-order: stroke fill;
   text-shadow:
-    0 0.06em 0 rgba(28, 2, 6, 0.72),
-    0 0.02em 0 rgba(255, 245, 230, 0.35),
-    0 0.12em 0.14em rgba(10, 0, 2, 0.45);
+    0 0 2px #ffffff,
+    0 0 4px #ffe8d8,
+    0 0 8px #ff9a8a,
+    0 0 14px #ff4d5c,
+    0 0 24px #ff1e3a,
+    0 0 38px rgba(255, 20, 55, 0.85),
+    0 0 54px rgba(220, 0, 40, 0.45),
+    0 0.05em 0.08em rgba(40, 0, 8, 0.28);
+  animation: bb-neon-pulse 3.6s ease-in-out infinite;
 }
 .bb-b1 {
   transform: translate(-72%, -54%) rotate(-5deg);
   z-index: 1;
+  animation-delay: 0s;
 }
 .bb-b2 {
   transform: translate(-28%, -46%) rotate(4deg);
   z-index: 2;
-  color: #fff3e4;
+  color: #fffaf3;
+  animation-delay: 0.45s;
+}
+@keyframes bb-neon-pulse {
+  0%, 100% {
+    filter: brightness(1);
+    opacity: 1;
+  }
+  48% {
+    filter: brightness(1.08);
+    opacity: 0.96;
+  }
+  52% {
+    filter: brightness(0.94);
+    opacity: 0.9;
+  }
+  56% {
+    filter: brightness(1.05);
+    opacity: 1;
+  }
 }
 .hood-scallop {
   display: block;
   width: 100%;
   height: 46px;
   margin-top: -10px;
-  filter: drop-shadow(0 8px 6px rgba(70, 0, 10, 0.55));
+  filter:
+    drop-shadow(0 8px 6px rgba(70, 0, 10, 0.55))
+    drop-shadow(0 0 8px rgba(255, 45, 65, 0.65))
+    drop-shadow(0 0 18px rgba(255, 25, 55, 0.4));
 }
 .hood-scallop path {
   fill: #b31822;
@@ -380,24 +414,43 @@ input {
 .base-mark {
   position: relative;
   z-index: 1;
-  margin-top: 2px;
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: clamp(0.72rem, 2.4vw + 0.2rem, 0.95rem);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  margin-top: 0;
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 3.8vw + 0.35rem, 1.55rem);
+  letter-spacing: 0.04em;
+  text-transform: none;
   line-height: 1;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+  color: #fff4e4;
   background:
-    linear-gradient(180deg, #fff8ec 0%, #e8d0b4 45%, #c9a682 100%);
+    linear-gradient(
+      115deg,
+      #8a6a42 0%,
+      #ffe9c8 18%,
+      #fffaf0 32%,
+      #e8c896 48%,
+      #fff6e4 62%,
+      #d4ae78 78%,
+      #fff0d4 100%
+    );
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-stroke: 0.35px rgba(255, 230, 190, 0.35);
   filter:
-    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.85))
-    drop-shadow(0 0 6px rgba(255, 200, 140, 0.18));
+    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 0 5px rgba(255, 210, 140, 0.55))
+    drop-shadow(0 0 14px rgba(255, 170, 80, 0.35))
+    drop-shadow(0 0 22px rgba(255, 140, 50, 0.18));
+  animation: base-mark-shine 5.5s ease-in-out infinite;
+}
+@keyframes base-mark-shine {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .dice-window {
@@ -2168,8 +2221,8 @@ body.is-take .spot:not(:disabled) {
     font-size: clamp(1.95rem, 11vw, 2.55rem);
   }
   .base-mark {
-    font-size: clamp(0.62rem, 3.2vw, 0.78rem);
-    letter-spacing: 0.12em;
+    font-size: clamp(0.98rem, 4.4vw, 1.22rem);
+    letter-spacing: 0.03em;
   }
   .glass-body {
     height: 220px;
@@ -2186,4 +2239,11 @@ body.is-take .spot:not(:disabled) {
   .face-4 { transform: rotateX(-90deg) translateZ(29px); }
   .face-5 { transform: rotateY(-90deg) translateZ(29px); }
   .face-6 { transform: rotateY(180deg) translateZ(29px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-letter,
+  .base-mark {
+    animation: none;
+  }
 }
