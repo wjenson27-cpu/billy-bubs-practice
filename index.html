@@ -13,7 +13,7 @@
 
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><text x="16" y="22" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="15" fill="#f4efe2" letter-spacing="-1">BB</text></svg></span>
         <div>
           <p class="brand-kicker">Billy Bubs Practice</p>
           <h1>Bubble Craps</h1>
@@ -400,8 +400,20 @@
 
     <footer class="footer">
       <p class="footer-line">Practice only. No real money. Not affiliated with any casino or equipment maker.</p>
-      <p class="visit-count" aria-live="polite">Visits <strong id="visit-count">…</strong></p>
+      <p class="site-meta visit-count" aria-live="polite">Visits <strong id="visit-count">…</strong></p>
     </footer>
+
+    <aside class="coach-card" id="coach-card" hidden>
+      <h2>Quick start</h2>
+      <ol class="coach-steps">
+        <li>Pick a <strong>chip</strong></li>
+        <li>Tap <strong>Pass</strong> on the layout</li>
+        <li>Hit <strong>Roll</strong></li>
+      </ol>
+      <div class="coach-actions">
+        <button type="button" class="ghost" id="coach-dismiss">Got it</button>
+      </div>
+    </aside>
 
     <div class="toasts" id="toasts" aria-live="polite"></div>
 

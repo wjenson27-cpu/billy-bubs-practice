@@ -945,6 +945,24 @@
     els.rulesPill = $("rules-pill");
   }
 
+  var COACH_KEY = "bb-coach-dismissed-v1";
+
+  function setupCoach() {
+    var card = $("coach-card");
+    var dismiss = $("coach-dismiss");
+    if (!card) return;
+    var seen = false;
+    try { seen = localStorage.getItem(COACH_KEY) === "1"; } catch (_) {}
+    if (seen) return;
+    card.hidden = false;
+    if (dismiss) {
+      dismiss.addEventListener("click", function () {
+        card.hidden = true;
+        try { localStorage.setItem(COACH_KEY, "1"); } catch (_) {}
+      });
+    }
+  }
+
   function start() {
     cacheEls();
     var saved = load();
@@ -961,6 +979,7 @@
     buildNumbers();
     bind();
     render();
+    setupCoach();
   }
 
   root.CrapsUI = { start: start };
