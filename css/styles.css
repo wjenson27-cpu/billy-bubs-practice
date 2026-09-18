@@ -2247,3 +2247,25 @@ body.is-take .spot:not(:disabled) {
     animation: none;
   }
 }
+
+
+/* Visit counter */
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+.footer-line { margin: 0; }
+.visit-count {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 230, 180, 0.72);
+}
+.visit-count strong {
+  font-variant-numeric: tabular-nums;
+  color: #ffe9a8;
+  text-shadow: 0 0 10px rgba(255, 200, 80, 0.45);
+}

@@ -399,7 +399,8 @@
     </main>
 
     <footer class="footer">
-      Practice only. No real money. Not affiliated with any casino or equipment maker.
+      <p class="footer-line">Practice only. No real money. Not affiliated with any casino or equipment maker.</p>
+      <p class="visit-count" aria-live="polite">Visits <strong id="visit-count">…</strong></p>
     </footer>
 
     <div class="toasts" id="toasts" aria-live="polite"></div>
@@ -589,5 +590,18 @@
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
   <!-- Cloudflare Web Analytics --><script type="module" defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "979ed6d735ee4ae1a6fe313fb2ae3b53"}'></script><!-- End Cloudflare Web Analytics -->
+
+    <script>
+      (function () {
+        var el = document.getElementById("visit-count");
+        if (!el) return;
+        fetch("https://abacus.jasoncameron.dev/hit/billy-bubs-practice/visits")
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            el.textContent = Number(d && d.value != null ? d.value : 0).toLocaleString("en-US");
+          })
+          .catch(function () { el.textContent = "—"; });
+      })();
+    </script>
 </body>
 </html>
