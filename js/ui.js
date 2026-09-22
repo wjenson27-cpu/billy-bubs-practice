@@ -692,15 +692,35 @@
     screen.style.transform = "";
     screen.style.width = "";
     screen.style.transformOrigin = "";
-    if (!landscapeBoard()) return;
-    var avail = fit.clientHeight;
-    if (avail < 40) return;
-    screen.style.width = "100%";
-    var natural = screen.scrollHeight || screen.offsetHeight;
+    if (!landscapeBoard()) {
+      screen.removeAttribute("data-fit");
+      return;
+    }
+    var availH = fit.clientHeight;
+    var availW = fit.clientWidth;
+    if (availH < 40 || availW < 40) return;
+    screen.style.width = availW + "px";
+    var natural = screen.scrollHeight;
     if (!natural) return;
-    var scale = Math.min(1, (avail - 2) / natural);
-    screen.style.transformOrigin = "top center";
-    if (scale < 0.995) screen.style.transform = "scale(" + scale.toFixed(4) + ")";
+    var scale = Math.min(1, (availH - 1) / natural);
+    if (scale < 0.995) {
+      var layoutW = Math.ceil(availW / scale);
+      screen.style.width = layoutW + "px";
+      natural = screen.scrollHeight;
+      var scaleH = (availH - 1) / natural;
+      var scaleW = availW / layoutW;
+      scale = Math.min(scaleH, scaleW, 1);
+      if (scaleH > scale + 0.03) {
+        layoutW = Math.ceil(availW / Math.min(1, scaleH));
+        screen.style.width = layoutW + "px";
+        natural = screen.scrollHeight;
+        scaleH = (availH - 1) / natural;
+        scaleW = availW / (screen.offsetWidth || layoutW);
+        scale = Math.min(scaleH, scaleW, 1);
+      }
+    }
+    screen.style.transformOrigin = "top left";
+    if (scale < 0.995) screen.style.transform = "scale(" + Math.max(scale, 0.2).toFixed(4) + ")";
     screen.setAttribute("data-fit", scale.toFixed(3));
   }
 
@@ -759,6 +779,16 @@
       },
       { passive: true }
     );
+    els.pager.addEventListener("scrollend", function () {
+      if (!landscapeBoard()) return;
+      var width = els.pager.clientWidth || 1;
+      var index = Math.round(els.pager.scrollLeft / width);
+      var target = index * width;
+      if (Math.abs(els.pager.scrollLeft - target) > 1) {
+        els.pager.scrollTo({ left: target, behavior: "auto" });
+      }
+      updatePaneDots();
+    });
     if (els.paneSwitch) {
       els.paneSwitch.addEventListener("click", function (ev) {
         var btn = ev.target.closest(".pane-dot");
