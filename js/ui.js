@@ -423,8 +423,9 @@
     renderStats();
     renderLog();
     renderChips();
-    els.rollBtn.disabled = rolling;
+    setRollDisabled(rolling);
     updateRepeatButton();
+    fitFelt();
     updateMachineKeys();
     save();
   }
@@ -487,6 +488,9 @@
     }
     if (els.handRollsCountShoot) {
       els.handRollsCountShoot.textContent = String(state.handRolls || 0);
+    }
+    if (els.handRollsCountBubble) {
+      els.handRollsCountBubble.textContent = String(state.handRolls || 0);
     }
     if (els.startBetBtn) {
       var hasStart = !!(state.startingWagerSet && state.startingWagerSet.length);
@@ -665,10 +669,156 @@
     }
   }
 
+  function rollButtons() {
+    return document.querySelectorAll(".roll-btn");
+  }
+
+  function setRollDisabled(disabled) {
+    rollButtons().forEach(function (btn) {
+      btn.disabled = disabled;
+    });
+  }
+
+  var LANDSCAPE_BOARD = "(orientation: landscape) and (max-height: 500px) and (max-width: 980px)";
+
+  function landscapeBoard() {
+    return window.matchMedia(LANDSCAPE_BOARD).matches;
+  }
+
+  function fitFelt() {
+    var screen = els.table;
+    var fit = els.feltFit;
+    if (!screen || !fit) return;
+    screen.style.transform = "";
+    screen.style.width = "";
+    screen.style.transformOrigin = "";
+    if (!landscapeBoard()) {
+      screen.removeAttribute("data-fit");
+      return;
+    }
+    var availH = fit.clientHeight;
+    var availW = fit.clientWidth;
+    if (availH < 40 || availW < 40) return;
+    screen.style.width = availW + "px";
+    var natural = screen.scrollHeight;
+    if (!natural) return;
+    var scale = Math.min(1, (availH - 1) / natural);
+    if (scale < 0.995) {
+      var layoutW = Math.ceil(availW / scale);
+      screen.style.width = layoutW + "px";
+      natural = screen.scrollHeight;
+      var scaleH = (availH - 1) / natural;
+      var scaleW = availW / layoutW;
+      scale = Math.min(scaleH, scaleW, 1);
+      if (scaleH > scale + 0.03) {
+        layoutW = Math.ceil(availW / Math.min(1, scaleH));
+        screen.style.width = layoutW + "px";
+        natural = screen.scrollHeight;
+        scaleH = (availH - 1) / natural;
+        scaleW = availW / (screen.offsetWidth || layoutW);
+        scale = Math.min(scaleH, scaleW, 1);
+      }
+    }
+    screen.style.transformOrigin = "top left";
+    if (scale < 0.995) screen.style.transform = "scale(" + Math.max(scale, 0.2).toFixed(4) + ")";
+    screen.setAttribute("data-fit", scale.toFixed(3));
+  }
+
+  function activePaneName() {
+    var pager = els.pager;
+    if (!pager) return "felt";
+    var width = pager.clientWidth || 1;
+    var index = Math.round(pager.scrollLeft / width);
+    if (index < 0) index = 0;
+    var panes = pager.querySelectorAll(".board-pane");
+    var pane = panes[index] || panes[0];
+    return pane ? pane.getAttribute("data-pane") || "felt" : "felt";
+  }
+
+  function updatePaneDots() {
+    if (!els.paneSwitch) return;
+    var active = landscapeBoard() ? activePaneName() : "felt";
+    els.paneSwitch.querySelectorAll(".pane-dot").forEach(function (btn) {
+      var on = btn.getAttribute("data-pane") === active;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    els.paneSwitch.classList.toggle("is-bubble", active === "bubble");
+    document.body.setAttribute("data-board-pane", active);
+    if (els.pager) {
+      els.pager.querySelectorAll(".board-pane").forEach(function (pane) {
+        var on = !landscapeBoard() || pane.getAttribute("data-pane") === active;
+        if (landscapeBoard()) pane.setAttribute("aria-hidden", on ? "false" : "true");
+        else pane.removeAttribute("aria-hidden");
+      });
+    }
+  }
+
+  function setPane(name) {
+    var pager = els.pager;
+    if (!pager || !landscapeBoard()) return;
+    var panes = pager.querySelectorAll(".board-pane");
+    var index = 0;
+    for (var i = 0; i < panes.length; i++) {
+      if (panes[i].getAttribute("data-pane") === name) index = i;
+    }
+    pager.scrollTo({ left: index * pager.clientWidth, behavior: "smooth" });
+  }
+
+  function setupBoardPager() {
+    if (!els.pager) return;
+    var raf = 0;
+    els.pager.addEventListener(
+      "scroll",
+      function () {
+        if (raf) return;
+        raf = requestAnimationFrame(function () {
+          raf = 0;
+          updatePaneDots();
+        });
+      },
+      { passive: true }
+    );
+    els.pager.addEventListener("scrollend", function () {
+      if (!landscapeBoard()) return;
+      var width = els.pager.clientWidth || 1;
+      var index = Math.round(els.pager.scrollLeft / width);
+      var target = index * width;
+      if (Math.abs(els.pager.scrollLeft - target) > 1) {
+        els.pager.scrollTo({ left: target, behavior: "auto" });
+      }
+      updatePaneDots();
+    });
+    if (els.paneSwitch) {
+      els.paneSwitch.addEventListener("click", function (ev) {
+        var btn = ev.target.closest(".pane-dot");
+        if (!btn) return;
+        setPane(btn.getAttribute("data-pane"));
+      });
+    }
+    window.addEventListener("resize", function () {
+      fitFelt();
+      updatePaneDots();
+    });
+    if (window.ResizeObserver && els.feltFit) {
+      var observer = new ResizeObserver(function () {
+        fitFelt();
+      });
+      observer.observe(els.feltFit);
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        fitFelt();
+      });
+    }
+    fitFelt();
+    updatePaneDots();
+  }
+
   function doRoll() {
     if (rolling) return;
     rolling = true;
-    els.rollBtn.disabled = true;
+    setRollDisabled(true);
     rememberWagers();
     var dice = E.rollDice();
     paintLastRoll(dice);
@@ -865,14 +1015,22 @@
       renderChips();
       renderSpots();
     });
-    els.rollBtn.addEventListener("click", doRoll);
+    rollButtons().forEach(function (btn) {
+      btn.addEventListener("click", doRoll);
+    });
     els.repeatBtn.addEventListener("click", doRepeat);
     els.betsOffBtn.addEventListener("click", doBetsOff);
     els.acrossBtn.addEventListener("click", doBillysWay);
     els.startBetBtn.addEventListener("click", doResetStarting);
     window.addEventListener("keydown", function (ev) {
+      if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA")) return;
+      if (landscapeBoard() && (ev.key === "ArrowRight" || ev.key === "ArrowLeft")) {
+        ev.preventDefault();
+        setPane(ev.key === "ArrowRight" ? "bubble" : "felt");
+        return;
+      }
       if (ev.code !== "Space") return;
-      if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "BUTTON" || ev.target.tagName === "TEXTAREA")) return;
+      if (ev.target && ev.target.tagName === "BUTTON") return;
       ev.preventDefault();
       doRoll();
     });
@@ -943,6 +1101,10 @@
     els.btnHelp = $("btn-help");
     els.btnReset = $("btn-reset");
     els.rulesPill = $("rules-pill");
+    els.pager = $("board-pager");
+    els.feltFit = $("felt-fit");
+    els.paneSwitch = $("pane-switch");
+    els.handRollsCountBubble = $("hand-rolls-count-bubble");
   }
 
   var COACH_KEY = "bb-coach-dismissed-v1";
@@ -979,6 +1141,7 @@
     buildNumbers();
     bind();
     render();
+    setupBoardPager();
     setupCoach();
   }
 
