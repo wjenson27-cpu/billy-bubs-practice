@@ -711,6 +711,9 @@
     var fit = els.feltFit;
     var body = els.feltBody || screen;
     if (!screen || !fit) return;
+    // Phone landscape used to widen the felt and scale() it down so a short
+    // viewport would letterbox a crushed board. The landscape CSS now fills
+    // the pane height directly, so clear any leftover transform.
     body.style.transform = "";
     body.style.width = "";
     body.style.transformOrigin = "";
@@ -720,41 +723,7 @@
       screen.removeAttribute("data-fit");
       return;
     }
-    var header = screen.querySelector(".felt-header");
-    var headerH = 0;
-    if (header) {
-      var headerStyle = window.getComputedStyle(header);
-      headerH = header.offsetHeight + (parseFloat(headerStyle.marginBottom) || 0);
-    }
-    var screenStyle = window.getComputedStyle(screen);
-    var padY = (parseFloat(screenStyle.paddingTop) || 0) + (parseFloat(screenStyle.paddingBottom) || 0);
-    var padX = (parseFloat(screenStyle.paddingLeft) || 0) + (parseFloat(screenStyle.paddingRight) || 0);
-    var availH = fit.clientHeight - headerH - padY;
-    var availW = fit.clientWidth - padX;
-    if (availH < 40 || availW < 40) return;
-    body.style.width = availW + "px";
-    var natural = body.scrollHeight;
-    if (!natural) return;
-    var scale = Math.min(1, (availH - 1) / natural);
-    if (scale < 0.995) {
-      var layoutW = Math.ceil(availW / scale);
-      body.style.width = layoutW + "px";
-      natural = body.scrollHeight;
-      var scaleH = (availH - 1) / natural;
-      var scaleW = availW / layoutW;
-      scale = Math.min(scaleH, scaleW, 1);
-      if (scaleH > scale + 0.03) {
-        layoutW = Math.ceil(availW / Math.min(1, scaleH));
-        body.style.width = layoutW + "px";
-        natural = body.scrollHeight;
-        scaleH = (availH - 1) / natural;
-        scaleW = availW / (body.offsetWidth || layoutW);
-        scale = Math.min(scaleH, scaleW, 1);
-      }
-    }
-    body.style.transformOrigin = "top left";
-    if (scale < 0.995) body.style.transform = "scale(" + Math.max(scale, 0.2).toFixed(4) + ")";
-    screen.setAttribute("data-fit", scale.toFixed(3));
+    screen.setAttribute("data-fit", "1");
   }
 
   function activePaneName() {
