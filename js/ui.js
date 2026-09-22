@@ -680,9 +680,28 @@
   }
 
   var LANDSCAPE_BOARD = "(orientation: landscape) and (max-height: 500px) and (max-width: 980px)";
+  var PORTRAIT_BOARD = "(orientation: portrait) and (max-width: 700px)";
 
   function landscapeBoard() {
     return window.matchMedia(LANDSCAPE_BOARD).matches;
+  }
+
+  function portraitBoard() {
+    return window.matchMedia(PORTRAIT_BOARD).matches;
+  }
+
+  function phonePager() {
+    return landscapeBoard() || portraitBoard();
+  }
+
+  function boardMode() {
+    if (portraitBoard()) return "portrait";
+    if (landscapeBoard()) return "landscape";
+    return "desktop";
+  }
+
+  function defaultPaneName() {
+    return portraitBoard() ? "bubble" : "felt";
   }
 
   function fitFelt() {
@@ -737,7 +756,7 @@
 
   function updatePaneDots() {
     if (!els.paneSwitch) return;
-    var active = landscapeBoard() ? activePaneName() : "felt";
+    var active = phonePager() ? activePaneName() : "felt";
     els.paneSwitch.querySelectorAll(".pane-dot").forEach(function (btn) {
       var on = btn.getAttribute("data-pane") === active;
       btn.classList.toggle("is-active", on);
@@ -745,29 +764,99 @@
     });
     els.paneSwitch.classList.toggle("is-bubble", active === "bubble");
     document.body.setAttribute("data-board-pane", active);
+    document.body.setAttribute("data-board-mode", boardMode());
     if (els.pager) {
       els.pager.querySelectorAll(".board-pane").forEach(function (pane) {
-        var on = !landscapeBoard() || pane.getAttribute("data-pane") === active;
-        if (landscapeBoard()) pane.setAttribute("aria-hidden", on ? "false" : "true");
+        var on = !phonePager() || pane.getAttribute("data-pane") === active;
+        if (phonePager()) pane.setAttribute("aria-hidden", on ? "false" : "true");
         else pane.removeAttribute("aria-hidden");
       });
     }
   }
 
-  function setPane(name) {
+  function setPane(name, behavior) {
     var pager = els.pager;
-    if (!pager || !landscapeBoard()) return;
+    if (!pager || !phonePager()) return;
     var panes = pager.querySelectorAll(".board-pane");
     var index = 0;
     for (var i = 0; i < panes.length; i++) {
       if (panes[i].getAttribute("data-pane") === name) index = i;
     }
-    pager.scrollTo({ left: index * pager.clientWidth, behavior: "smooth" });
+    var left = index * (pager.clientWidth || 0);
+    if (behavior === "auto") {
+      var previous = pager.style.scrollBehavior;
+      pager.style.scrollBehavior = "auto";
+      pager.scrollLeft = left;
+      pager.style.scrollBehavior = previous;
+      updatePaneDots();
+    } else {
+      pager.scrollTo({ left: left, behavior: "smooth" });
+    }
   }
 
   function setupBoardPager() {
     if (!els.pager) return;
     var raf = 0;
+    var gestureDepth = 0;
+    var heldPane = null;
+    var orientPending = false;
+    var boardModeNow = "";
+
+    function pagerSettled() {
+      var width = els.pager.clientWidth || 1;
+      var left = els.pager.scrollLeft;
+      return Math.abs(left - Math.round(left / width) * width) < 2;
+    }
+
+    function snapOrientationDefault() {
+      if (!phonePager()) {
+        els.pager.scrollLeft = 0;
+        updatePaneDots();
+        return;
+      }
+      setPane(defaultPaneName(), "auto");
+    }
+
+    function finishGesture() {
+      gestureDepth = Math.max(0, gestureDepth - 1);
+      if (gestureDepth > 0) return;
+      if (!orientPending) return;
+      if (!pagerSettled()) return;
+      orientPending = false;
+      heldPane = null;
+      snapOrientationDefault();
+    }
+
+    function syncBoardMode() {
+      var next = boardMode();
+      var changed = next !== boardModeNow;
+      boardModeNow = next;
+      fitFelt();
+      if (!changed) {
+        updatePaneDots();
+        return;
+      }
+      var apply = function () {
+        fitFelt();
+        if (boardMode() === "desktop") {
+          els.pager.scrollLeft = 0;
+          orientPending = false;
+          updatePaneDots();
+          return;
+        }
+        if (gestureDepth > 0) {
+          orientPending = true;
+          if (heldPane) setPane(heldPane, "auto");
+          else updatePaneDots();
+          return;
+        }
+        orientPending = false;
+        snapOrientationDefault();
+      };
+      apply();
+      requestAnimationFrame(apply);
+    }
+
     els.pager.addEventListener(
       "scroll",
       function () {
@@ -775,12 +864,13 @@
         raf = requestAnimationFrame(function () {
           raf = 0;
           updatePaneDots();
+          if (orientPending && gestureDepth === 0 && pagerSettled()) finishGesture();
         });
       },
       { passive: true }
     );
     els.pager.addEventListener("scrollend", function () {
-      if (!landscapeBoard()) return;
+      if (!phonePager()) return;
       var width = els.pager.clientWidth || 1;
       var index = Math.round(els.pager.scrollLeft / width);
       var target = index * width;
@@ -788,18 +878,36 @@
         els.pager.scrollTo({ left: target, behavior: "auto" });
       }
       updatePaneDots();
+      if (orientPending && gestureDepth === 0) {
+        orientPending = false;
+        heldPane = null;
+        snapOrientationDefault();
+      }
     });
+    els.pager.addEventListener("pointerdown", function () {
+      gestureDepth += 1;
+      heldPane = activePaneName();
+    });
+    window.addEventListener("pointerup", finishGesture);
+    window.addEventListener("pointercancel", finishGesture);
     if (els.paneSwitch) {
       els.paneSwitch.addEventListener("click", function (ev) {
         var btn = ev.target.closest(".pane-dot");
         if (!btn) return;
-        setPane(btn.getAttribute("data-pane"));
+        orientPending = false;
+        setPane(btn.getAttribute("data-pane"), "smooth");
       });
     }
     window.addEventListener("resize", function () {
-      fitFelt();
-      updatePaneDots();
+      if (boardMode() !== boardModeNow) syncBoardMode();
+      else {
+        fitFelt();
+        updatePaneDots();
+      }
     });
+    window.addEventListener("orientationchange", syncBoardMode);
+    window.matchMedia(PORTRAIT_BOARD).addEventListener("change", syncBoardMode);
+    window.matchMedia(LANDSCAPE_BOARD).addEventListener("change", syncBoardMode);
     if (window.ResizeObserver && els.feltFit) {
       var observer = new ResizeObserver(function () {
         fitFelt();
@@ -811,8 +919,7 @@
         fitFelt();
       });
     }
-    fitFelt();
-    updatePaneDots();
+    syncBoardMode();
   }
 
   function doRoll() {
@@ -1024,7 +1131,7 @@
     els.startBetBtn.addEventListener("click", doResetStarting);
     window.addEventListener("keydown", function (ev) {
       if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA")) return;
-      if (landscapeBoard() && (ev.key === "ArrowRight" || ev.key === "ArrowLeft")) {
+      if (phonePager() && (ev.key === "ArrowRight" || ev.key === "ArrowLeft")) {
         ev.preventDefault();
         setPane(ev.key === "ArrowRight" ? "bubble" : "felt");
         return;
