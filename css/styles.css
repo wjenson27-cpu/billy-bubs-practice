@@ -3489,6 +3489,383 @@ body.is-take .spot:not(:disabled) {
   .prop-middle .hard-all-day .for-pay {
     font-size: 0.62rem;
   }
+
+  /*
+   * Fill the pane height instead of letterboxing a scaled-down board.
+   * Rows share leftover pixels; number totals and buy/place odds keep a
+   * readable floor. Chrome stays short so the felt gets the viewport.
+   */
+  .topbar {
+    padding: 0 6px;
+  }
+  .mode-switch {
+    padding: 1px;
+  }
+  .mode-btn {
+    padding: 2px 8px;
+    font-size: 0.62rem;
+    line-height: 1.05;
+  }
+  .layout {
+    gap: 2px;
+    padding: 0 4px;
+  }
+  .pane-felt {
+    display: flex;
+    flex-direction: column;
+  }
+  .felt-fit {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .screen {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: auto;
+    padding: 2px 4px 2px;
+  }
+  .felt-header {
+    flex: 0 0 auto;
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+  .felt-header .wordmark {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .felt-header .wordmark-sub {
+    display: none;
+  }
+  .felt-header .practice-badge,
+  .felt-header .fun-pill {
+    padding: 1px 5px;
+  }
+  .felt-header .practice-kicker,
+  .felt-header .fun-pill .k {
+    display: none;
+  }
+  .felt-header .practice-cash,
+  .felt-header .fun-copy strong,
+  .felt-header .fun-tag {
+    line-height: 1;
+  }
+  .felt-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  /* basis 0 so a percentage height cannot swallow the pane */
+  .felt-body > .make-em,
+  .felt-body > .come-band,
+  .felt-body > .field,
+  .felt-body > .pass-row {
+    flex: 0.42 1 0;
+    min-height: 18px;
+    margin-top: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+  .felt-body > .point-bar,
+  .felt-body > .last-roll {
+    flex: 0 0 auto;
+    margin: 0;
+  }
+  .felt-body > .numbers {
+    flex: 2.1 1 0;
+    min-height: 54px;
+    margin: 0;
+    overflow: hidden;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .felt-body > .prop-cluster {
+    flex: 1.55 1 0;
+    min-height: 46px;
+    margin-top: 0;
+    overflow: hidden;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .make-em {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .make-em .make-spot,
+  .come-band .spot,
+  .pass-row .spot {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .spot.field {
+    height: auto;
+    min-height: 16px;
+    flex-wrap: nowrap;
+    align-self: stretch;
+    padding: 1px 4px;
+    font-size: 0.78rem;
+    line-height: 1;
+    letter-spacing: 0.08em;
+  }
+  .make-em .make-spot {
+    flex-wrap: nowrap;
+    padding: 1px 4px;
+    gap: 2px 4px;
+  }
+  .make-em .make-accent {
+    display: none;
+  }
+  .make-em .lamps {
+    flex: 1 1 auto;
+    order: 3;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    margin: 0;
+    gap: 1px;
+  }
+  .make-em .make-title {
+    font-size: 0.62rem;
+  }
+  .make-em .for-pay {
+    font-size: 0.62rem;
+  }
+  .make-em .lamp {
+    min-width: 11px;
+    height: 11px;
+    font-size: 0.48rem;
+    padding: 0 1px;
+  }
+  .come-band .spot,
+  .pass-row .spot {
+    padding: 1px 3px;
+    font-size: 0.78rem;
+    line-height: 1;
+    letter-spacing: 0.06em;
+  }
+  .field-nums {
+    font-size: 0.72rem;
+    gap: 3px;
+  }
+  .field-pays,
+  .dont-pass-note {
+    font-size: 0.58rem;
+  }
+  .point-readout {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .puck {
+    width: 16px;
+    height: 16px;
+    font-size: 0.42rem;
+  }
+  .puck::before {
+    inset: 2px;
+  }
+  .hand-rolls {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 4px;
+    padding: 0 4px;
+  }
+  .hand-rolls .k,
+  .point-readout .k {
+    font-size: 0.5rem;
+    line-height: 1;
+  }
+  .hand-rolls strong,
+  .point-readout strong {
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+  .rules-pill {
+    padding: 1px 6px;
+    font-size: 0.55rem;
+    line-height: 1;
+  }
+  .last-roll {
+    padding: 0 4px;
+    gap: 4px;
+    min-height: 0;
+    max-height: 16px;
+  }
+  .last-roll .k {
+    font-size: 0.55rem;
+    line-height: 1;
+  }
+  .last-roll-empty {
+    font-size: 0.68rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .roll-die {
+    width: 14px;
+    height: 14px;
+  }
+  .number-cell {
+    height: 100%;
+    min-height: 0;
+    padding: 1px 2px 2px;
+    gap: 1px;
+    justify-content: stretch;
+  }
+  .number-cell .n {
+    flex: 1 1 auto;
+    display: grid;
+    place-items: center;
+    min-height: 1em;
+    font-size: clamp(1.05rem, 6vh, 1.7rem);
+    line-height: 1;
+  }
+  .number-cell .spot.buy,
+  .number-cell .spot.place {
+    flex: 0.85 1 auto;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0 3px;
+    min-height: 15px;
+    padding: 1px 2px;
+    line-height: 1;
+  }
+  .number-cell .place-k,
+  .number-cell .spot.buy small,
+  .number-cell .spot.place small,
+  .number-cell .off-tag {
+    font-size: clamp(0.72rem, 3vh, 0.84rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+  [data-rules="crapless"] .number-cell .n {
+    font-size: clamp(0.78rem, 4.2vh, 1.15rem);
+  }
+  [data-rules="crapless"] .number-cell .place-k,
+  [data-rules="crapless"] .number-cell .spot.buy small,
+  [data-rules="crapless"] .number-cell .spot.place small {
+    font-size: clamp(0.62rem, 2.4vh, 0.72rem);
+  }
+  .horn-block,
+  .hardway-rail,
+  .prop-middle {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding: 1px 2px;
+  }
+  .rail-label {
+    margin: 0;
+    font-size: 0.5rem;
+    line-height: 1;
+  }
+  .horn-grid,
+  .hardway-rail .hardway-spots {
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 2px;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .ce-row {
+    margin-top: 2px;
+    min-height: 0;
+  }
+  .hard-spot,
+  .hop-spot,
+  .ce-spot,
+  .horn-spot {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    flex-flow: row nowrap;
+    padding: 0 2px;
+  }
+  .hw-name,
+  .hard-spot small,
+  .hop-spot small,
+  .ce-spot small,
+  .horn-spot small {
+    font-size: 0.58rem;
+    line-height: 1;
+  }
+  .hw-die {
+    width: 11px;
+    height: 11px;
+  }
+  .ce-letter {
+    font-size: 0.78rem;
+    line-height: 1;
+  }
+  .prop-middle {
+    gap: 2px;
+    padding: 0;
+  }
+  .prop-middle .spot.any7-hero,
+  .prop-middle .hard-all-day {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+    padding: 1px 3px;
+  }
+  .any7-title {
+    font-size: clamp(0.72rem, 3vh, 1.02rem);
+    line-height: 1;
+  }
+  .any7-sub,
+  .spot.any7-hero small {
+    font-size: 0.58rem;
+    line-height: 1;
+    margin-top: 0;
+  }
+  .any7-flame {
+    width: 14px;
+    height: 20px;
+  }
+  .prop-middle .hard-all-day .make-title,
+  .prop-middle .hard-all-day .for-pay {
+    font-size: 0.62rem;
+    line-height: 1.05;
+  }
+  .pane-switch {
+    gap: 4px;
+    padding: 0 8px calc(1px + env(safe-area-inset-bottom, 0px));
+  }
+  .pane-dot {
+    gap: 1px;
+    font-size: 0.58rem;
+    line-height: 1;
+    padding: 1px 6px 0;
+  }
+  .pane-pip {
+    width: 7px;
+    height: 7px;
+  }
+  .pane-swipe-hint {
+    font-size: 0.55rem;
+  }
+  .console .chip {
+    width: 32px;
+    height: 32px;
+  }
+  .chips-panel {
+    padding: 1px 2px;
+    gap: 4px;
+  }
+  .action-toggle button {
+    padding: 2px 7px;
+    line-height: 1.05;
+  }
+  .machine-key {
+    padding: 2px 6px;
+  }
+  .repeat-btn {
+    padding: 4px 8px;
+  }
 }
 
 /*
