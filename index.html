@@ -13,11 +13,16 @@
 
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><text x="16" y="22" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="15" fill="#f4efe2" letter-spacing="-1">BB</text></svg></span>
-        <div>
-          <p class="brand-kicker">Billy Bubs Practice</p>
-          <h1>Bubble Craps</h1>
-          <p class="tagline"><span class="no-cash">No Cash</span> · Regular or crapless · Practice only</p>
+        <div class="practice-badge">
+          <span class="practice-dot" aria-hidden="true"></span>
+          <div class="practice-copy">
+            <p class="practice-kicker">Practice Mode</p>
+            <p class="practice-cash">No Cash</p>
+          </div>
+        </div>
+        <div class="brand-lockup">
+          <h1>Billy Bubs</h1>
+          <p class="tagline"><span aria-hidden="true">★</span> Practice <span aria-hidden="true">★</span> · Bubble Craps</p>
         </div>
       </div>
 
@@ -31,9 +36,18 @@
       </div>
 
       <div class="rack">
-        <div class="rack-stat">
-          <span class="k">Credits</span>
-          <strong id="bankroll">$1,000</strong>
+        <div class="rack-stat rack-fun">
+          <svg class="fun-die" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+            <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="#f7f4ee" stroke="#e4d7b4" stroke-width="1.5"/>
+            <circle cx="10" cy="10" r="2.1" fill="#1a1a1a"/>
+            <circle cx="16" cy="16" r="2.1" fill="#1a1a1a"/>
+            <circle cx="22" cy="22" r="2.1" fill="#1a1a1a"/>
+          </svg>
+          <div class="rack-fun-copy">
+            <span class="k">Balance</span>
+            <strong id="bankroll">$1,000</strong>
+          </div>
+          <span class="fun-tag">FUN</span>
         </div>
         <div class="rack-stat">
           <span class="k">On table</span>
@@ -53,35 +67,76 @@
             <div class="board-pane pane-felt" id="pane-felt" data-pane="felt" role="tabpanel" aria-labelledby="pane-tab-felt">
               <div class="felt-fit" id="felt-fit">
                 <div class="screen" id="table">
-                    <div class="screen-brand">
-                      <div class="billy-row">
-                        <strong>Billy Bubs Practice</strong>
-                        <span class="no-cash">No Cash</span>
+                    <svg class="felt-swoosh felt-swoosh-l" viewBox="0 0 160 46" aria-hidden="true">
+                      <path d="M6 38c34-4 52-26 86-32" fill="none" stroke="#e6d3a8" stroke-width="1.6" opacity="0.55"/>
+                      <path d="M6 44c40-4 62-30 104-36" fill="none" stroke="#e6d3a8" stroke-width="1.2" opacity="0.32"/>
+                    </svg>
+                    <svg class="felt-swoosh felt-swoosh-r" viewBox="0 0 160 46" aria-hidden="true">
+                      <path d="M6 38c34-4 52-26 86-32" fill="none" stroke="#e6d3a8" stroke-width="1.6" opacity="0.55"/>
+                      <path d="M6 44c40-4 62-30 104-36" fill="none" stroke="#e6d3a8" stroke-width="1.2" opacity="0.32"/>
+                    </svg>
+                    <div class="felt-header">
+                      <div class="practice-badge">
+                        <span class="practice-dot" aria-hidden="true"></span>
+                        <div class="practice-copy">
+                          <p class="practice-kicker">Practice Mode</p>
+                          <p class="practice-cash">No Cash</p>
+                        </div>
                       </div>
-                      <div class="screen-title">
-                        <span class="title-word">Bubble</span>
-                        <span class="title-dice" aria-hidden="true">
-                          <span class="mini-die" data-face="6"></span>
-                          <span class="mini-die" data-face="5"></span>
-                        </span>
-                        <span class="title-word">Craps</span>
+                      <div class="felt-wordmark">
+                        <p class="wordmark">Billy Bubs</p>
+                        <p class="wordmark-sub"><span aria-hidden="true">★</span> Practice <span aria-hidden="true">★</span></p>
+                      </div>
+                      <div class="fun-pill">
+                        <svg class="fun-die" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+                          <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="#f7f4ee" stroke="#e4d7b4" stroke-width="1.5"/>
+                          <circle cx="10" cy="10" r="2.1" fill="#1a1a1a"/>
+                          <circle cx="16" cy="16" r="2.1" fill="#1a1a1a"/>
+                          <circle cx="22" cy="22" r="2.1" fill="#1a1a1a"/>
+                        </svg>
+                        <div class="fun-copy">
+                          <span class="k">Balance</span>
+                          <strong id="felt-bankroll">$1,000</strong>
+                        </div>
+                        <span class="fun-tag">FUN</span>
                       </div>
                     </div>
 
+                    <div class="felt-body" id="felt-body">
                     <div class="make-em" aria-label="Low Rolls, Roll Em All, High Rolls">
                       <button type="button" class="spot make-spot" data-kind="small">
+                        <span class="make-accent" aria-hidden="true">
+                          <svg viewBox="0 0 42 28" width="42" height="28">
+                            <ellipse cx="21" cy="22" rx="15" ry="4.4" fill="#0d5c30"/>
+                            <ellipse cx="21" cy="17.5" rx="15" ry="4.4" fill="#167a3e"/>
+                            <ellipse cx="21" cy="13" rx="15" ry="4.6" fill="#2eaf5c"/>
+                            <ellipse cx="21" cy="13" rx="8.5" ry="2.1" fill="#e7ffef"/>
+                          </svg>
+                        </span>
                         <span class="lamps" data-progress="small"></span>
                         <span class="make-title">Low Rolls</span>
                         <span class="for-pay">31 FOR 1</span>
                         <span class="spot-amt"></span>
                       </button>
                       <button type="button" class="spot make-spot make-all" data-kind="all">
+                        <span class="make-accent make-dice" aria-hidden="true">
+                          <span class="hw-die" data-face="5"></span>
+                          <span class="hw-die" data-face="6"></span>
+                        </span>
                         <span class="lamps lamps-all" data-progress="all"></span>
                         <span class="make-title">Roll ’Em All</span>
                         <span class="for-pay">156 FOR 1</span>
                         <span class="spot-amt"></span>
                       </button>
                       <button type="button" class="spot make-spot" data-kind="tall">
+                        <span class="make-accent" aria-hidden="true">
+                          <svg viewBox="0 0 42 28" width="42" height="28">
+                            <ellipse cx="21" cy="22" rx="15" ry="4.4" fill="#4a2078"/>
+                            <ellipse cx="21" cy="17.5" rx="15" ry="4.4" fill="#6c32a4"/>
+                            <ellipse cx="21" cy="13" rx="15" ry="4.6" fill="#8d4ec8"/>
+                            <ellipse cx="21" cy="13" rx="8.5" ry="2.1" fill="#f6ecff"/>
+                          </svg>
+                        </span>
                         <span class="lamps" data-progress="tall"></span>
                         <span class="make-title">High Rolls</span>
                         <span class="for-pay">31 FOR 1</span>
@@ -114,6 +169,7 @@
                       </div>
                     </div>
 
+                    <p class="numbers-kicker">Buy / Place numbers</p>
                     <div class="numbers" id="numbers"></div>
 
                     <div class="lines come-band">
@@ -197,12 +253,16 @@
                         </div>
                       <div class="prop-middle">
                         <button type="button" class="spot any7-hero" data-kind="any7" aria-label="Big Red, any seven, 4 to 1">
-                            <svg class="any7-flame" viewBox="0 0 24 32" aria-hidden="true">
-                              <path fill="#ffb020" d="M12 1c2.2 5.2 1 7.4-1.1 9.2 3.2.1 6.1 2.8 6.1 7.1a7 7 0 1 1-14 0c0-3.1 1.8-5.2 3.2-7.1 1.8 2.1 3.1 2.2 4.1 1.1C9.2 8.2 10.2 4.6 12 1z"/>
-                              <path fill="#fff4c8" d="M12 15.5c1.3 2.1.6 3.4-.5 4.4 1.5.2 2.8 1.5 2.8 3.2a3.2 3.2 0 1 1-6.4 0c0-1.4.9-2.4 1.5-3.2.9.9 1.3.9 1.7.4-.4-1.5.1-3.4 1.9-4.8z"/>
+                            <svg class="any7-flame" viewBox="0 0 64 88" aria-hidden="true">
+                              <path fill="#e23b12" d="M32 4c8 16 6 24 2 32 10-2 18 8 20 20 2 16-10 28-22 28S8 72 8 56c0-10 6-16 10-24 4 8 8 8 10 4C30 24 30 14 32 4z"/>
+                              <path fill="#ff8a14" d="M32 28c5 10 4 16 1 22 6 0 12 6 13 14 1 10-6 18-14 18s-15-8-15-18c0-6 3-10 6-16 3 5 5 5 7 2 1-8 1-16 2-22z"/>
+                              <path fill="#ffe7a8" d="M33 52c2 6 1 10-1 13 3 1 5 4 5 8 0 6-4 10-9 10s-9-5-9-11c0-4 2-7 4-9 1 2 3 2 4 0 0-4 2-8 6-11z"/>
                             </svg>
-                            <span class="any7-title">Big Red</span>
-                            <small>4:1</small>
+                            <span class="any7-copy">
+                              <span class="any7-title">Big Red</span>
+                              <span class="any7-sub">Any 7</span>
+                              <small>4 to 1</small>
+                            </span>
                             <span class="spot-amt"></span>
                           </button>
                         <button type="button" class="spot make-spot hard-all-day" data-kind="hardAllDay">
@@ -274,6 +334,7 @@
                         Lay Odds
                         <span class="spot-amt"></span>
                       </button>
+                    </div>
                     </div>
                   </div>
               </div>
@@ -432,7 +493,7 @@
           Bubble
         </button>
       </div>
-      <span class="pane-swipe-hint">swipe</span>
+      <span class="pane-swipe-hint"><span class="swipe-chevron" aria-hidden="true">⌃</span>swipe</span>
     </nav>
 
     <footer class="footer">
