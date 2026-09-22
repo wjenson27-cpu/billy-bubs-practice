@@ -49,271 +49,289 @@
     <main class="layout">
       <section class="stage" aria-label="Machine">
         <div class="cabinet">
-          <div class="bubble-stage">
-            <div class="bubble-ambient" aria-hidden="true"></div>
-            <div class="bubble-column">
-              <div class="bubble-hood" aria-hidden="true">
-                <div class="hood-dome">
-                  <span class="hood-monogram" aria-label="BB">
-                    <span class="bb-letter bb-b1">B</span>
-                    <span class="bb-letter bb-b2">B</span>
-                  </span>
-                </div>
-                <svg class="hood-scallop" viewBox="0 0 240 56" preserveAspectRatio="none">
-                  <path
-                    d="M0 0 H240 V6
-                    C232 6 230 48 216 50
-                    C200 52 196 10 180 10
-                    C164 10 160 54 144 54
-                    C128 54 124 10 108 10
-                    C92 10 88 54 72 54
-                    C56 54 52 10 36 10
-                    C22 10 18 50 8 40
-                    L0 8 Z"
-                  />
-                </svg>
+          <div class="board-pager" id="board-pager">
+            <div class="board-pane pane-felt" id="pane-felt" data-pane="felt" role="tabpanel" aria-labelledby="pane-tab-felt">
+              <div class="felt-fit" id="felt-fit">
+                <div class="screen" id="table">
+                    <div class="screen-brand">
+                      <div class="billy-row">
+                        <strong>Billy Bubs Practice</strong>
+                        <span class="no-cash">No Cash</span>
+                      </div>
+                      <div class="screen-title">
+                        <span class="title-word">Bubble</span>
+                        <span class="title-dice" aria-hidden="true">
+                          <span class="mini-die" data-face="6"></span>
+                          <span class="mini-die" data-face="5"></span>
+                        </span>
+                        <span class="title-word">Craps</span>
+                      </div>
+                    </div>
+
+                    <div class="make-em" aria-label="Low Rolls, Roll Em All, High Rolls">
+                      <button type="button" class="spot make-spot" data-kind="small">
+                        <span class="lamps" data-progress="small"></span>
+                        <span class="make-title">Low Rolls</span>
+                        <span class="for-pay">31 FOR 1</span>
+                        <span class="spot-amt"></span>
+                      </button>
+                      <button type="button" class="spot make-spot make-all" data-kind="all">
+                        <span class="lamps lamps-all" data-progress="all"></span>
+                        <span class="make-title">Roll ’Em All</span>
+                        <span class="for-pay">156 FOR 1</span>
+                        <span class="spot-amt"></span>
+                      </button>
+                      <button type="button" class="spot make-spot" data-kind="tall">
+                        <span class="lamps" data-progress="tall"></span>
+                        <span class="make-title">High Rolls</span>
+                        <span class="for-pay">31 FOR 1</span>
+                        <span class="spot-amt"></span>
+                      </button>
+                    </div>
+
+                    <div class="point-bar">
+                      <div class="puck-board">
+                        <div class="puck" id="puck" data-on="false">
+                          <span class="puck-off">OFF</span>
+                          <span class="puck-on">ON</span>
+                        </div>
+                        <div class="point-readout">
+                          <span class="k" id="phase-label">Come-out</span>
+                          <strong id="point-label">No point</strong>
+                        </div>
+                        <div class="hand-rolls" id="hand-rolls" title="Rolls this shooter hand (resets after seven-out)">
+                          <span class="k">Hand rolls</span>
+                          <strong id="hand-rolls-count">0</strong>
+                        </div>
+                      </div>
+                      <div class="rules-pill" id="rules-pill">Regular rules</div>
+                    </div>
+
+                    <div class="last-roll" id="last-roll" aria-live="polite">
+                      <span class="k">Last roll</span>
+                      <div class="last-roll-body is-empty" id="last-roll-body">
+                        <span class="last-roll-empty">Roll to see the combo on the felt</span>
+                      </div>
+                    </div>
+
+                    <div class="numbers" id="numbers"></div>
+
+                    <div class="lines come-band">
+                      <button type="button" class="spot come" data-kind="come">
+                        Come
+                        <span class="spot-amt"></span>
+                      </button>
+                      <button type="button" class="spot dont-come regular-only" data-kind="dontCome">
+                        Don't Come
+                        <span class="spot-amt"></span>
+                      </button>
+                    </div>
+
+                    <button type="button" class="spot field" data-kind="field">
+                      <span class="field-nums">
+                        <em>2</em> <span>3</span> <span>4</span> <span>9</span> <span>10</span> <span>11</span> <em>12</em>
+                      </span>
+                      <span class="field-title">Field</span>
+                      <span class="field-pays">2 pays double</span>
+                      <span class="spot-amt"></span>
+                    </button>
+
+                    <div class="prop-cluster">
+                      <div class="horn-block">
+                          <div class="rail-label">Horn</div>
+                          <div class="horn-grid">
+                            <button type="button" class="spot hop-spot" data-kind="hop" data-number="2">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="1"></span>
+                                <span class="hw-die" data-face="1"></span>
+                              </span>
+                              <span class="hw-name">Aces</span>
+                              <small>2 · 30:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot hop-spot" data-kind="hop" data-number="12">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="6"></span>
+                                <span class="hw-die" data-face="6"></span>
+                              </span>
+                              <span class="hw-name">Midnight</span>
+                              <small>12 · 30:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot hop-spot" data-kind="hop" data-number="3">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="1"></span>
+                                <span class="hw-die" data-face="2"></span>
+                              </span>
+                              <span class="hw-name">Ace-deuce</span>
+                              <small>3 · 15:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot hop-spot" data-kind="hop" data-number="11">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="5"></span>
+                                <span class="hw-die" data-face="6"></span>
+                              </span>
+                              <span class="hw-name">Yo</span>
+                              <small>11 · 15:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                          </div>
+                          <div class="ce-row">
+                            <button type="button" class="spot prop ce-spot" data-kind="anyCraps">
+                              <span class="ce-letter">C</span>
+                              <small>7:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot prop ce-spot" data-kind="eleven">
+                              <span class="ce-letter">E</span>
+                              <small>15:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot prop horn-spot" data-kind="horn">
+                              <span class="hw-name">Horn 4-way</span>
+                              <small>$4 unit</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                          </div>
+                        </div>
+                      <div class="prop-middle">
+                        <button type="button" class="spot any7-hero" data-kind="any7" aria-label="Big Red, any seven, 4 to 1">
+                            <span class="any7-title">Big Red</span>
+                            <small>4:1</small>
+                            <span class="spot-amt"></span>
+                          </button>
+                        <button type="button" class="spot make-spot hard-all-day" data-kind="hardAllDay">
+                            <span class="make-title">Hard Way All Day</span>
+                            <span class="for-pay">165 FOR 1</span>
+                            <small>Hard 4+6+8+10 before 7 · easy don’t count</small>
+                            <span class="lamps" data-progress="hardAllDay"></span>
+                            <span class="spot-amt"></span>
+                          </button>
+                      </div>
+                      <div class="hardway-rail">
+                          <div class="rail-label">Hard Ways</div>
+                          <div class="hardway-spots">
+                            <button type="button" class="spot hard-spot" data-kind="hardway" data-number="6">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="3"></span>
+                                <span class="hw-die" data-face="3"></span>
+                              </span>
+                              <span class="hw-name">Hard 6</span>
+                              <small>9:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot hard-spot" data-kind="hardway" data-number="10">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="5"></span>
+                                <span class="hw-die" data-face="5"></span>
+                              </span>
+                              <span class="hw-name">Hard 10</span>
+                              <small>7:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot hard-spot" data-kind="hardway" data-number="4">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="2"></span>
+                                <span class="hw-die" data-face="2"></span>
+                              </span>
+                              <span class="hw-name">Hard 4</span>
+                              <small>7:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                            <button type="button" class="spot hard-spot" data-kind="hardway" data-number="8">
+                              <span class="hw-pair" aria-hidden="true">
+                                <span class="hw-die" data-face="4"></span>
+                                <span class="hw-die" data-face="4"></span>
+                              </span>
+                              <span class="hw-name">Hard 8</span>
+                              <small>9:1</small>
+                              <span class="spot-amt"></span>
+                            </button>
+                          </div>
+                        </div>
+                    </div>
+
+                    <div class="pass-row pass-bottom">
+                      <button type="button" class="spot pass" data-kind="pass">
+                        Pass Line
+                        <span class="spot-amt"></span>
+                      </button>
+                      <button type="button" class="spot odds" data-kind="passOdds">
+                        Odds
+                        <span class="spot-amt"></span>
+                      </button>
+                      <button type="button" class="spot dont-pass regular-only" data-kind="dontPass">
+                        Don't Pass
+                        <span class="dont-pass-note">Bar 12</span>
+                        <span class="spot-amt"></span>
+                      </button>
+                      <button type="button" class="spot odds regular-only" data-kind="dontPassOdds">
+                        Lay Odds
+                        <span class="spot-amt"></span>
+                      </button>
+                    </div>
+                  </div>
               </div>
-              <div class="bubble-cylinder">
-                <span class="post post-l1" aria-hidden="true"></span>
-                <span class="post post-l2" aria-hidden="true"></span>
-                <span class="post post-r1" aria-hidden="true"></span>
-                <span class="post post-r2" aria-hidden="true"></span>
-                <div class="glass-body">
-                  <div class="glass-shine" aria-hidden="true"></div>
-                  <div class="glass-shine shine-r" aria-hidden="true"></div>
-                  <div class="bubble-floor"></div>
-                  <div class="dice-window" aria-live="polite">
-                    <div class="die-scene" id="die1" data-face="5" aria-label="Die showing 5"></div>
-                    <div class="die-scene" id="die2" data-face="2" aria-label="Die showing 2"></div>
+            </div>
+            <div class="board-pane pane-bubble" id="pane-bubble" data-pane="bubble" role="tabpanel" aria-labelledby="pane-tab-bubble">
+              <div class="bubble-stage">
+                  <div class="bubble-ambient" aria-hidden="true"></div>
+                  <div class="bubble-column">
+                    <div class="bubble-hood" aria-hidden="true">
+                      <div class="hood-dome">
+                        <span class="hood-monogram" aria-label="BB">
+                          <span class="bb-letter bb-b1">B</span>
+                          <span class="bb-letter bb-b2">B</span>
+                        </span>
+                      </div>
+                      <svg class="hood-scallop" viewBox="0 0 240 56" preserveAspectRatio="none">
+                        <path
+                          d="M0 0 H240 V6
+                          C232 6 230 48 216 50
+                          C200 52 196 10 180 10
+                          C164 10 160 54 144 54
+                          C128 54 124 10 108 10
+                          C92 10 88 54 72 54
+                          C56 54 52 10 36 10
+                          C22 10 18 50 8 40
+                          L0 8 Z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="bubble-cylinder">
+                      <span class="post post-l1" aria-hidden="true"></span>
+                      <span class="post post-l2" aria-hidden="true"></span>
+                      <span class="post post-r1" aria-hidden="true"></span>
+                      <span class="post post-r2" aria-hidden="true"></span>
+                      <div class="glass-body">
+                        <div class="glass-shine" aria-hidden="true"></div>
+                        <div class="glass-shine shine-r" aria-hidden="true"></div>
+                        <div class="bubble-floor"></div>
+                        <div class="dice-window" aria-live="polite">
+                          <div class="die-scene" id="die1" data-face="5" aria-label="Die showing 5"></div>
+                          <div class="die-scene" id="die2" data-face="2" aria-label="Die showing 2"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="bubble-collar"></div>
+                    <div class="bubble-base">
+                      <span class="base-mark">Billy Bubs</span>
+                    </div>
+                    <div class="dice-total" id="dice-total">—</div>
                   </div>
                 </div>
-              </div>
-              <div class="bubble-collar"></div>
-              <div class="bubble-base">
-                <span class="base-mark">Billy Bubs</span>
-              </div>
-              <div class="dice-total" id="dice-total">—</div>
-            </div>
-          </div>
-
-          <div class="screen" id="table">
-            <div class="screen-brand">
-              <div class="billy-row">
-                <strong>Billy Bubs Practice</strong>
-                <span class="no-cash">No Cash</span>
-              </div>
-              <div class="screen-title">
-                <span class="title-word">Bubble</span>
-                <span class="title-dice" aria-hidden="true">
-                  <span class="mini-die" data-face="6"></span>
-                  <span class="mini-die" data-face="5"></span>
-                </span>
-                <span class="title-word">Craps</span>
-              </div>
-            </div>
-
-            <div class="make-em" aria-label="Low Rolls, Roll Em All, High Rolls">
-              <button type="button" class="spot make-spot" data-kind="small">
-                <span class="lamps" data-progress="small"></span>
-                <span class="make-title">Low Rolls</span>
-                <span class="for-pay">31 FOR 1</span>
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot make-spot make-all" data-kind="all">
-                <span class="lamps lamps-all" data-progress="all"></span>
-                <span class="make-title">Roll ’Em All</span>
-                <span class="for-pay">156 FOR 1</span>
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot make-spot" data-kind="tall">
-                <span class="lamps" data-progress="tall"></span>
-                <span class="make-title">High Rolls</span>
-                <span class="for-pay">31 FOR 1</span>
-                <span class="spot-amt"></span>
-              </button>
-            </div>
-
-            <div class="point-bar">
-              <div class="puck-board">
-                <div class="puck" id="puck" data-on="false">
-                  <span class="puck-off">OFF</span>
-                  <span class="puck-on">ON</span>
-                </div>
-                <div class="point-readout">
-                  <span class="k" id="phase-label">Come-out</span>
-                  <strong id="point-label">No point</strong>
-                </div>
-                <div class="hand-rolls" id="hand-rolls" title="Rolls this shooter hand (resets after seven-out)">
+              <div class="bubble-roll-dock">
+                <p class="bubble-back-hint"><span aria-hidden="true">‹</span> Swipe left back to felt</p>
+                <div class="bubble-hand" title="Rolls this shooter hand">
                   <span class="k">Hand rolls</span>
-                  <strong id="hand-rolls-count">0</strong>
+                  <strong id="hand-rolls-count-bubble">0</strong>
                 </div>
+                <button type="button" class="roll-btn roll-btn-pane" id="roll-btn-pane">
+                  <span class="roll-kicker">Shoot</span>
+                  <span class="roll-label">Roll</span>
+                </button>
               </div>
-              <div class="rules-pill" id="rules-pill">Regular rules</div>
-            </div>
-
-            <div class="last-roll" id="last-roll" aria-live="polite">
-              <span class="k">Last roll</span>
-              <div class="last-roll-body is-empty" id="last-roll-body">
-                <span class="last-roll-empty">Roll to see the combo on the felt</span>
-              </div>
-            </div>
-
-            <div class="numbers" id="numbers"></div>
-
-            <div class="lines come-band">
-              <button type="button" class="spot come" data-kind="come">
-                Come
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot make-spot hard-all-day" data-kind="hardAllDay">
-                <span class="make-title">Hard Way All Day</span>
-                <span class="for-pay">165 FOR 1</span>
-                <small>Hard 4+6+8+10 before 7 · easy don’t count</small>
-                <span class="lamps" data-progress="hardAllDay"></span>
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot dont-come regular-only" data-kind="dontCome">
-                Don't Come
-                <span class="spot-amt"></span>
-              </button>
-            </div>
-
-            <button type="button" class="spot field" data-kind="field">
-              <span class="field-nums">
-                <em>2</em> <span>3</span> <span>4</span> <span>9</span> <span>10</span> <span>11</span> <em>12</em>
-              </span>
-              <span class="field-title">Field</span>
-              <span class="field-pays">2 pays double</span>
-              <span class="spot-amt"></span>
-            </button>
-
-            <div class="prop-cluster">
-              <div class="hardway-rail">
-                <div class="rail-label">Hard Ways</div>
-                <div class="hardway-spots">
-                  <button type="button" class="spot hard-spot" data-kind="hardway" data-number="6">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="3"></span>
-                      <span class="hw-die" data-face="3"></span>
-                    </span>
-                    <span class="hw-name">Hard 6</span>
-                    <small>9:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot hard-spot" data-kind="hardway" data-number="10">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="5"></span>
-                      <span class="hw-die" data-face="5"></span>
-                    </span>
-                    <span class="hw-name">Hard 10</span>
-                    <small>7:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot hard-spot" data-kind="hardway" data-number="4">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="2"></span>
-                      <span class="hw-die" data-face="2"></span>
-                    </span>
-                    <span class="hw-name">Hard 4</span>
-                    <small>7:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot hard-spot" data-kind="hardway" data-number="8">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="4"></span>
-                      <span class="hw-die" data-face="4"></span>
-                    </span>
-                    <span class="hw-name">Hard 8</span>
-                    <small>9:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                </div>
-              </div>
-
-              <button type="button" class="spot any7-hero" data-kind="any7" aria-label="Big Red, any seven, 4 to 1">
-                <span class="any7-title">Big Red</span>
-                <small>4:1</small>
-                <span class="spot-amt"></span>
-              </button>
-
-              <div class="horn-block">
-                <div class="rail-label">Horn</div>
-                <div class="horn-grid">
-                  <button type="button" class="spot hop-spot" data-kind="hop" data-number="2">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="1"></span>
-                      <span class="hw-die" data-face="1"></span>
-                    </span>
-                    <span class="hw-name">Aces</span>
-                    <small>2 · 30:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot hop-spot" data-kind="hop" data-number="12">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="6"></span>
-                      <span class="hw-die" data-face="6"></span>
-                    </span>
-                    <span class="hw-name">Midnight</span>
-                    <small>12 · 30:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot hop-spot" data-kind="hop" data-number="3">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="1"></span>
-                      <span class="hw-die" data-face="2"></span>
-                    </span>
-                    <span class="hw-name">Ace-deuce</span>
-                    <small>3 · 15:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot hop-spot" data-kind="hop" data-number="11">
-                    <span class="hw-pair" aria-hidden="true">
-                      <span class="hw-die" data-face="5"></span>
-                      <span class="hw-die" data-face="6"></span>
-                    </span>
-                    <span class="hw-name">Yo</span>
-                    <small>11 · 15:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                </div>
-                <div class="ce-row">
-                  <button type="button" class="spot prop ce-spot" data-kind="anyCraps">
-                    <span class="ce-letter">C</span>
-                    <small>7:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot prop ce-spot" data-kind="eleven">
-                    <span class="ce-letter">E</span>
-                    <small>15:1</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                  <button type="button" class="spot prop horn-spot" data-kind="horn">
-                    <span class="hw-name">Horn 4-way</span>
-                    <small>$4 unit</small>
-                    <span class="spot-amt"></span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="pass-row pass-bottom">
-              <button type="button" class="spot pass" data-kind="pass">
-                Pass Line
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot odds" data-kind="passOdds">
-                Odds
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot dont-pass regular-only" data-kind="dontPass">
-                Don't Pass
-                <span class="dont-pass-note">Bar 12</span>
-                <span class="spot-amt"></span>
-              </button>
-              <button type="button" class="spot odds regular-only" data-kind="dontPassOdds">
-                Lay Odds
-                <span class="spot-amt"></span>
-              </button>
             </div>
           </div>
         </div>
@@ -398,6 +416,21 @@
       </aside>
     </main>
 
+
+    <nav class="pane-switch" id="pane-switch" aria-label="Felt or bubble">
+      <div class="pane-switch-dots" role="tablist">
+        <button type="button" class="pane-dot is-active" role="tab" id="pane-tab-felt" data-pane="felt" aria-selected="true" aria-controls="pane-felt">
+          <span class="pane-pip" aria-hidden="true"></span>
+          Felt
+        </button>
+        <button type="button" class="pane-dot" role="tab" id="pane-tab-bubble" data-pane="bubble" aria-selected="false" aria-controls="pane-bubble">
+          <span class="pane-pip" aria-hidden="true"></span>
+          Bubble
+        </button>
+      </div>
+      <span class="pane-swipe-hint">swipe</span>
+    </nav>
+
     <footer class="footer">
       <p class="footer-line">Practice only. No real money. Not affiliated with any casino or equipment maker.</p>
       <p class="site-meta visit-count" aria-live="polite">Visits <strong id="visit-count">…</strong></p>
@@ -459,7 +492,7 @@
           <section>
             <h3>Hard Way All Day (side wager)</h3>
             <p>
-              Lives between Come and Don't Come. Separate from the single Hard 4/6/8/10 bets. Wins only if
+              Sits in the middle of the prop cluster, under Big Red and between the Horn and the hardways. Separate from the single Hard 4/6/8/10 bets. Wins only if
               <strong>Hard 4, Hard 6, Hard 8, and Hard 10</strong> all appear (matching dice) before a 7. Soft/easy
               4, 6, 8, or 10 do not count and do not lose the bet. A 7 before the set is complete loses.
               <strong>165 FOR 1</strong> ($165 returned per $1, includes stake → $164 profit). Dealer Envy is not
@@ -469,9 +502,11 @@
           <section>
             <h3>Single hardways, Horn, C, and E</h3>
             <p>
-              Hardways sit left in a 2×2 (Hard 6 &amp; 10 over Hard 4 &amp; 8). Center is <strong>Big Red</strong>
-              (any 7, no seven-dice art — table etiquette). Horn legs are the right 2×2. Pass Line and Don't Pass
-              run along the bottom of the felt. Hard 4 / 6 / 8 / 10 stay up until a hard win (paid, bet stays), a 7,
+              Horn legs sit left in a 2×2 (Aces and Midnight over Ace-deuce and Yo), with C, E, and Horn 4-way
+              under that block. The middle column is <strong>Big Red</strong> (any 7, no seven-dice art — table
+              etiquette) stacked above <strong>Hard Way All Day</strong>. Hardways sit right in a 2×2 (Hard 6 &amp; 10
+              over Hard 4 &amp; 8). Pass Line and Don't Pass run along the bottom of the felt. Come and Don't Come
+              are the only bets in the come band. Hard 4 / 6 / 8 / 10 stay up until a hard win (paid, bet stays), a 7,
               the easy way, or you take them down. One-roll props repeat after a win like a machine.
             </p>
             <ul>
@@ -557,8 +592,9 @@
             <h3>Last roll and history</h3>
             <p>
               After each roll the <strong>dice combo</strong> (both faces and the total, e.g. 3–4 = 7) shows
-              on the felt above the numbers — not only in the bubble. On a phone that bar stays in view
-              while you scroll the bets. Matching dice are marked Hard. The <strong>last-rolls rail</strong>
+              on the felt above the numbers — not only in the bubble. On a phone in portrait that bar stays in view
+              while you scroll the bets. Turn sideways and the felt fills its own screen: swipe to the bubble
+              for the dice and the Roll button, then swipe back. Matching dice are marked Hard. The <strong>last-rolls rail</strong>
               sits under Repeat / Roll and shows each combo, not just the total. Big Red never shows
               seven-dice art (table etiquette).
             </p>
