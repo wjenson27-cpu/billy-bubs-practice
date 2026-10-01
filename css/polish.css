@@ -1,0 +1,1546 @@
+/*
+ * BillyBubs — visual polish layer (draft).
+ * Loaded AFTER styles.css. Visual only: no game logic, odds, payouts or rules.
+ * Direction: deep felt green, one refined gold, crisp off-white, one casino red.
+ * Two typefaces: Cinzel (brand + numbers) and Archivo (UI; condensed via font-stretch).
+ */
+
+:root {
+  /* Palette */
+  --bb-bg: #0a0e0c;
+  --bb-panel: #111714;
+  --bb-panel-2: #161d19;
+  --bb-hairline: rgba(244, 238, 223, 0.09);
+  --bb-felt: #0f4a31;
+  --bb-felt-mid: #0c3d29;
+  --bb-felt-deep: #072619;
+  --bb-gold: #c9a961;
+  --bb-gold-hi: #e4cc8f;
+  --bb-gold-line: rgba(214, 186, 120, 0.62);
+  --bb-gold-faint: rgba(214, 186, 120, 0.28);
+  --bb-cream: #f4eedf;
+  --bb-cream-2: rgba(244, 238, 223, 0.72);
+  --bb-cream-3: rgba(244, 238, 223, 0.5);
+  --bb-red: #b0202b;
+  --bb-red-hi: #cf3540;
+  --bb-red-deep: #6d1018;
+  --bb-win: #7fd3a0;
+  --bb-loss: #ec8a82;
+  --bb-spot: rgba(0, 0, 0, 0.2);
+  --bb-spot-hover: rgba(244, 238, 223, 0.06);
+
+  /* Shape + depth */
+  --bb-r-xs: 6px;
+  --bb-r-sm: 8px;
+  --bb-r: 10px;
+  --bb-r-lg: 16px;
+  --bb-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --bb-shadow-2: 0 8px 22px rgba(0, 0, 0, 0.38);
+  --bb-condensed: 78%;
+
+  /* Remap the original tokens so every legacy rule inherits the new palette. */
+  --felt: var(--bb-felt-mid);
+  --felt-deep: var(--bb-felt-deep);
+  --felt-hi: var(--bb-felt);
+  --felt-spot: var(--bb-spot);
+  --rail: var(--bb-gold-hi);
+  --rail-soft: var(--bb-gold-line);
+  --rail-glow: transparent;
+  --cream: var(--bb-cream);
+  --buy: var(--bb-gold-hi);
+  --ink: var(--bb-cream);
+  --muted: var(--bb-cream-2);
+  --pass: var(--bb-gold-hi);
+  --come: var(--bb-cream);
+  --gold: var(--bb-gold-hi);
+  --lamp: var(--bb-gold-hi);
+  --line: var(--bb-gold-line);
+  --bg: var(--bb-bg);
+  --panel: var(--bb-panel);
+  --win: var(--bb-win);
+  --danger: var(--bb-loss);
+  --font: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --display: "Archivo", "Arial Narrow", sans-serif;
+  --serif: "Cinzel", "Palatino Linotype", Palatino, serif;
+  --script: "Cinzel", "Palatino Linotype", Palatino, serif;
+  --mono: "Archivo", ui-monospace, monospace;
+  --radius: 12px;
+}
+
+html,
+body {
+  background:
+    radial-gradient(1100px 520px at 50% -12%, rgba(20, 84, 54, 0.32), transparent 60%),
+    var(--bb-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Top bar ---------- */
+.brand h1,
+.wordmark {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--bb-cream);
+  text-shadow: none;
+}
+.tagline {
+  color: var(--bb-gold);
+  letter-spacing: 0.2em;
+  font-size: 0.68rem;
+}
+.practice-badge,
+.fun-pill,
+.rack-fun {
+  border: 1px solid var(--bb-gold-faint);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: none;
+  border-radius: var(--bb-r);
+}
+.practice-dot {
+  width: 8px;
+  height: 8px;
+  background: #5fbf86;
+  box-shadow: 0 0 0 3px rgba(95, 191, 134, 0.16);
+}
+.practice-kicker {
+  color: var(--bb-cream-2);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+.practice-cash {
+  font-weight: 600;
+}
+.fun-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--bb-gold);
+  padding: 2px 6px;
+  border: 1px solid var(--bb-gold-faint);
+  border-radius: 999px;
+}
+.fun-die {
+  filter: none;
+}
+.mode-switch {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--bb-hairline);
+}
+.mode-btn {
+  color: var(--bb-cream-2);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.mode-btn.is-active {
+  background: var(--bb-gold);
+  color: #17140c;
+  box-shadow: var(--bb-shadow-1);
+}
+.rack-stat strong,
+.point-readout strong {
+  font-weight: 650;
+}
+
+/* ---------- Cabinet + bubble ---------- */
+.cabinet {
+  background: linear-gradient(180deg, #151b18, #0e1311 55%, #0b0f0d);
+  border: 1px solid var(--bb-hairline);
+  box-shadow: var(--bb-shadow-2);
+  border-radius: 22px;
+}
+.bubble-stage {
+  background: radial-gradient(ellipse at 50% 100%, rgba(20, 90, 55, 0.18), transparent 60%);
+}
+.bubble-ambient {
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.06), transparent 30%),
+    radial-gradient(ellipse at 50% 92%, rgba(30, 120, 70, 0.16), transparent 52%);
+  filter: blur(10px);
+}
+.hood-dome {
+  background:
+    radial-gradient(ellipse at 34% 16%, rgba(255, 225, 215, 0.3), transparent 40%),
+    radial-gradient(120% 90% at 50% -10%, #c8343a, #a81c26 45%, #7a121b 80%, #560c12);
+  box-shadow:
+    inset 0 8px 10px rgba(255, 220, 210, 0.18),
+    inset 0 -8px 10px rgba(50, 0, 6, 0.35),
+    0 6px 0 #5c0e15,
+    0 10px 24px rgba(0, 0, 0, 0.35);
+}
+.hood-scallop {
+  filter: drop-shadow(0 6px 5px rgba(40, 0, 6, 0.45));
+}
+.hood-scallop path {
+  fill: #9a1923;
+}
+/* BB monogram: two crisp Cinzel capitals that kiss, no neon flicker. */
+.hood-monogram {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  margin-top: -2px;
+  gap: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 7vw, 2.6rem);
+  filter: none;
+}
+.bb-letter {
+  position: static;
+  transform: none;
+  font-family: var(--serif);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--bb-cream);
+  -webkit-text-stroke: 0;
+  text-shadow:
+    0 1px 0 rgba(70, 0, 10, 0.7),
+    0 0 12px rgba(255, 210, 190, 0.28);
+  animation: none;
+}
+.bb-b1,
+.bb-b2 {
+  transform: none;
+  color: var(--bb-cream);
+}
+.bb-b2 {
+  margin-left: -0.12em;
+  color: var(--bb-gold-hi);
+}
+.glass-body {
+  border: 1.5px solid rgba(236, 246, 255, 0.34);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.26) 0 2.5%, transparent 12%, transparent 88%, rgba(255, 255, 255, 0.12)),
+    radial-gradient(90% 50% at 50% 126%, rgba(70, 220, 140, 0.4), transparent 50%),
+    linear-gradient(180deg, rgba(230, 240, 255, 0.08), rgba(12, 24, 18, 0.04));
+  box-shadow:
+    inset 10px 0 18px rgba(255, 255, 255, 0.1),
+    inset -10px 0 18px rgba(10, 20, 30, 0.14);
+}
+.glass-shine {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.01));
+}
+.bubble-floor {
+  background: radial-gradient(circle at 50% 42%, #e9fff0 0 6%, #8fe8b0 16%, #2fb46a 38%, #137c45 66%, #0a4d2c 100%);
+  box-shadow:
+    0 0 26px 4px rgba(70, 220, 140, 0.32),
+    inset 0 8px 14px rgba(255, 255, 255, 0.28);
+}
+.bubble-base {
+  background: radial-gradient(circle at 50% 28%, #262a2f, #0d0f12 60%, #050506);
+}
+.base-mark {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(0.72rem, 2.4vw, 0.9rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  padding-left: 0.32em;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: var(--bb-gold);
+  -webkit-text-stroke: 0;
+  filter: none;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  animation: none;
+}
+.dice-total {
+  font-weight: 650;
+  color: var(--bb-cream);
+  text-shadow: none;
+}
+.die-face {
+  background: linear-gradient(160deg, #fbf9f4, #ece7dc);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.07), inset 0 -2px 3px rgba(0, 0, 0, 0.05);
+}
+.die-face .pip.on {
+  background: #17181a;
+  box-shadow: none;
+}
+.die-scene {
+  filter: drop-shadow(0 8px 6px rgba(0, 30, 14, 0.4));
+}
+
+/* ---------- Felt ---------- */
+.screen {
+  background:
+    url("../assets/felt-grain.svg"),
+    radial-gradient(110% 70% at 50% 30%, rgba(30, 120, 76, 0.38), transparent 70%),
+    radial-gradient(80% 50% at 50% 115%, rgba(0, 0, 0, 0.42), transparent 55%),
+    linear-gradient(180deg, #11523a 0%, var(--bb-felt-mid) 40%, #0a3423 78%, var(--bb-felt-deep) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(228, 204, 143, 0.7),
+    inset 0 0 0 4px rgba(4, 22, 13, 0.7),
+    inset 0 -24px 44px rgba(0, 0, 0, 0.28),
+    0 0 0 7px #120f0a,
+    0 0 0 8px rgba(201, 169, 97, 0.55);
+}
+.felt-swoosh {
+  display: none;
+}
+.felt-header .wordmark {
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.08em;
+}
+.wordmark-sub {
+  color: var(--bb-gold);
+  letter-spacing: 0.34em;
+}
+.wordmark-sub span {
+  color: var(--bb-gold);
+  text-shadow: none;
+  font-size: 0.8em;
+}
+.numbers-kicker {
+  color: var(--bb-cream-3);
+  letter-spacing: 0.26em;
+}
+
+/* The top bar already carries Practice Mode + Balance on desktop and phone
+   portrait, so the duplicate pills inside the felt header are hidden there.
+   (Phone landscape hides the top bar, so they stay on the felt.) */
+.felt-header {
+  grid-template-columns: minmax(0, 1fr);
+}
+.felt-header .practice-badge,
+.felt-header .fun-pill {
+  display: none;
+}
+
+/* Every betting spot: one hairline, no haze. */
+.spot {
+  border: 1px solid var(--bb-gold-line);
+  background: var(--bb-spot);
+  border-radius: var(--bb-r);
+  box-shadow: none;
+  transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.spot:hover:not(:disabled) {
+  filter: none;
+  background-color: var(--bb-spot-hover);
+}
+.spot.has-bet {
+  box-shadow: inset 0 0 0 1px var(--bb-gold-hi);
+  border-color: var(--bb-gold-hi);
+}
+.spot small,
+.field-pays,
+.dont-pass-note {
+  color: var(--bb-cream-2);
+  font-weight: 500;
+}
+.make-spot,
+.prop-middle .hard-all-day,
+.hard-spot,
+.hardway-rail,
+.number-cell {
+  border: 1px solid var(--bb-gold-line);
+  box-shadow: none;
+}
+.make-spot {
+  background: var(--bb-spot);
+  border-radius: var(--bb-r);
+}
+.make-all {
+  border-color: var(--bb-gold);
+  box-shadow: inset 0 0 0 1px rgba(201, 169, 97, 0.25);
+}
+.make-title {
+  color: var(--bb-cream);
+  font-weight: 600;
+}
+.for-pay {
+  color: var(--bb-gold-hi);
+  font-weight: 700;
+}
+.lamp {
+  background: transparent;
+  color: var(--bb-cream-2);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(244, 238, 223, 0.3);
+}
+.lamp.is-lit {
+  background: var(--bb-gold-hi);
+  color: #1b1608;
+  box-shadow: none;
+}
+
+/* Puck: casino convention — black OFF, white ON. */
+.puck {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.puck::before {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.puck[data-on="false"] {
+  background: radial-gradient(circle at 34% 28%, #3a3d41, #141517 70%);
+  color: var(--bb-cream);
+  box-shadow: 0 0 0 1.5px rgba(244, 238, 223, 0.55), 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.puck[data-on="true"] {
+  background: radial-gradient(circle at 34% 28%, #ffffff, #e9e4d8 70%);
+  color: #17181a;
+  box-shadow: 0 0 0 1.5px #17181a, 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.puck[data-on="true"]::before {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+.number-cell .mini-puck {
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle at 34% 28%, #ffffff, #e9e4d8 70%);
+  box-shadow: 0 0 0 1px #17181a, 0 2px 4px rgba(0, 0, 0, 0.45);
+  display: none;
+  place-items: center;
+  font: 700 0.46rem/1 var(--font);
+  letter-spacing: 0.06em;
+  color: #17181a;
+  z-index: 3;
+}
+.number-cell .mini-puck::after {
+  content: "ON";
+}
+.number-cell.is-point .mini-puck {
+  display: grid;
+}
+.rules-pill,
+.hand-rolls {
+  border: 1px solid var(--bb-gold-faint);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--bb-cream-2);
+}
+.hand-rolls strong,
+.hand-rolls-shoot,
+.bubble-hand strong {
+  color: var(--bb-gold-hi);
+}
+
+/* Numbers */
+.number-cell {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--bb-r);
+}
+.number-cell.is-point {
+  border-color: var(--bb-gold-hi);
+  box-shadow: inset 0 0 0 1px var(--bb-gold-hi), 0 0 0 1px rgba(228, 204, 143, 0.25);
+  background: rgba(228, 204, 143, 0.07);
+}
+.number-cell .n {
+  color: var(--bb-cream);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+}
+.spot.buy,
+.spot.place {
+  color: var(--bb-cream);
+}
+.spot.buy small {
+  color: var(--bb-gold-hi);
+}
+.spot.place small {
+  color: var(--bb-cream);
+}
+.place-k {
+  font-weight: 600;
+  color: var(--bb-cream-2);
+}
+.number-cell .spot.buy.has-bet,
+.number-cell .spot.place.has-bet {
+  background: rgba(228, 204, 143, 0.1);
+  box-shadow: inset 0 0 0 1px var(--bb-gold-hi);
+}
+/* "OFF" on the come-out: quiet outlined tag instead of 12 red pills. */
+.off-tag {
+  background: transparent;
+  color: var(--bb-cream-3);
+  border: 1px solid rgba(244, 238, 223, 0.28);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0 4px;
+}
+.spot.place.is-working-off,
+.spot.buy.is-working-off {
+  background: transparent;
+  box-shadow: none;
+}
+.spot.place.is-working-off.has-bet,
+.spot.buy.is-working-off.has-bet {
+  box-shadow: inset 0 0 0 1px rgba(244, 238, 223, 0.45);
+}
+.spot.odds-mini {
+  border: 1px solid var(--bb-gold-faint);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--bb-gold-hi);
+}
+
+/* Line bets */
+.spot.come,
+.come-band .dont-come,
+.spot.dont-pass,
+.pass-row .spot.odds {
+  background: var(--bb-spot);
+  border: 1px solid var(--bb-gold-line);
+  box-shadow: none;
+  text-shadow: none;
+  color: var(--bb-cream);
+}
+.spot.come {
+  border-color: rgba(244, 238, 223, 0.7);
+}
+.spot.dont-pass {
+  border: 1px dashed rgba(244, 238, 223, 0.6);
+}
+.spot.pass,
+.spot.field {
+  background: rgba(201, 169, 97, 0.07);
+  border: 1px solid var(--bb-gold);
+  box-shadow: none;
+  text-shadow: none;
+  color: var(--bb-gold-hi);
+}
+.spot.pass,
+.spot.come,
+.spot.field {
+  font-weight: 600;
+}
+.field-title {
+  color: var(--bb-gold-hi);
+  text-shadow: none;
+}
+.field-nums {
+  color: var(--bb-cream);
+  text-shadow: none;
+}
+.field-nums em {
+  color: var(--bb-gold-hi);
+}
+
+/* Prop cluster: Horn now shares the felt language (was purple). */
+.horn-block,
+.hardway-rail {
+  border: 1px solid var(--bb-gold-faint);
+  background: rgba(0, 0, 0, 0.14);
+  box-shadow: none;
+}
+.horn-block .rail-label,
+.hardway-rail .rail-label {
+  color: var(--bb-gold);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+.hop-spot,
+.horn-block .ce-spot,
+.horn-block .horn-spot,
+.hard-spot {
+  background: var(--bb-spot);
+  border: 1px solid var(--bb-gold-line);
+  color: var(--bb-cream);
+  box-shadow: none;
+}
+.hw-name {
+  font-weight: 600;
+}
+.ce-letter {
+  color: var(--bb-gold-hi);
+  font-family: var(--serif);
+  font-stretch: normal;
+}
+.spot.any7-hero {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--bb-red) 0%, var(--bb-red-deep) 100%);
+  border: 1px solid rgba(255, 214, 200, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(60, 0, 8, 0.35);
+}
+.any7-title {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 0 rgba(40, 0, 6, 0.55);
+}
+.any7-sub {
+  color: rgba(255, 236, 232, 0.86);
+}
+.spot.any7-hero small {
+  color: var(--bb-gold-hi);
+}
+.any7-flame {
+  filter: drop-shadow(0 0 4px rgba(255, 140, 30, 0.55));
+}
+.prop-middle .hard-all-day {
+  background: var(--bb-spot);
+}
+
+/* Last roll */
+.last-roll {
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--bb-gold-faint);
+  box-shadow: none;
+}
+.last-roll .k {
+  color: var(--bb-cream-3);
+  white-space: nowrap;
+}
+.last-roll-read strong {
+  color: var(--bb-cream);
+  font-weight: 650;
+}
+.last-roll-eq {
+  color: var(--bb-gold-hi);
+  text-shadow: none;
+  font-weight: 650;
+}
+.last-roll.is-seven .last-roll-eq {
+  color: #f2a9a2;
+  text-shadow: none;
+}
+.last-roll.is-craps .last-roll-eq {
+  color: var(--bb-cream);
+}
+.hard-tag {
+  background: transparent;
+  color: var(--bb-gold-hi);
+  border: 1px solid var(--bb-gold);
+  font-weight: 700;
+}
+.last-roll.has-roll.is-hard {
+  box-shadow: inset 0 0 0 1px rgba(228, 204, 143, 0.35);
+}
+
+/* ---------- Chips (SVG) ---------- */
+.chip,
+.felt-chip {
+  background: center / 100% 100% no-repeat url("../assets/chips/chip-1.svg");
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+.chip[data-value="5"],
+.felt-chip.is-5 {
+  background-image: url("../assets/chips/chip-5.svg");
+  --chip-ink: #fff8ec;
+}
+.chip[data-value="25"],
+.felt-chip.is-25 {
+  background-image: url("../assets/chips/chip-25.svg");
+  --chip-ink: #fff8ec;
+}
+.chip[data-value="100"],
+.felt-chip.is-100 {
+  background-image: url("../assets/chips/chip-100.svg");
+  --chip-ink: var(--bb-gold-hi);
+}
+.chip[data-value="1"],
+.felt-chip.is-1 {
+  --chip-ink: #1d2c40;
+}
+.chip-rim,
+.chip-mascot {
+  display: none;
+}
+.chip-inset,
+.felt-chip .chip-inset,
+.console .chip-inset,
+.spot.buy .felt-chip .chip-inset,
+.spot.place .felt-chip .chip-inset,
+.spot.odds-mini .felt-chip .chip-inset,
+.screen .felt-chip .chip-inset {
+  inset: 18%;
+  background: transparent;
+  box-shadow: none;
+  color: var(--chip-ink);
+}
+.chip-bb {
+  font-family: var(--serif);
+  font-stretch: normal;
+  font-size: 0.42rem;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+.chip-core {
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+/* Wide amounts stay round: shrink the type instead of stretching the chip. */
+.felt-chip.is-wide {
+  width: 42px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 50%;
+}
+.felt-chip.is-wide .chip-inset {
+  inset: 14%;
+  border-radius: 50%;
+}
+.felt-chip.is-wide .chip-core {
+  font-size: 0.5rem;
+  letter-spacing: -0.03em;
+}
+.felt-chip .chip-bb {
+  display: none;
+}
+.chip {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.chip.is-selected {
+  outline: none;
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 2px var(--bb-bg),
+    0 0 0 4px var(--bb-gold-hi),
+    0 6px 10px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Console ---------- */
+.panel,
+.history-strip {
+  background: var(--bb-panel);
+  border: 1px solid var(--bb-hairline);
+  border-radius: var(--radius);
+}
+.panel h2,
+.drawer-inner h2 {
+  color: var(--bb-cream-2);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+}
+.action-toggle {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--bb-hairline);
+}
+.action-toggle button {
+  color: var(--bb-cream-2);
+  font-weight: 600;
+}
+.action-toggle button.is-active,
+.solid {
+  background: var(--bb-gold);
+  color: #17140c;
+  font-weight: 700;
+}
+.ghost {
+  border: 1px solid rgba(244, 238, 223, 0.2);
+  color: var(--bb-cream);
+}
+.ghost:hover,
+.action-toggle button:not(.is-active):hover {
+  background: rgba(244, 238, 223, 0.06);
+}
+.drop-off {
+  border: 1px dashed rgba(244, 238, 223, 0.2);
+  background: transparent;
+  border-radius: var(--bb-r);
+}
+
+/* Machine keys: one neutral key style; Billy's Way gets the gold signature. */
+.machine-key,
+.repeat-btn,
+.hand-rolls-shoot {
+  background: linear-gradient(180deg, #1b221e, #131916);
+  border: 1px solid rgba(244, 238, 223, 0.14);
+  color: var(--bb-cream);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, var(--bb-shadow-1);
+  border-radius: 12px;
+}
+.machine-key .key-kicker,
+.repeat-kicker,
+.roll-kicker,
+.hand-rolls-shoot .k {
+  color: var(--bb-cream-3);
+  opacity: 1;
+  font-weight: 600;
+}
+.machine-key .key-label,
+.repeat-label {
+  font-weight: 650;
+  letter-spacing: 0.08em;
+}
+.across-btn {
+  border-color: var(--bb-gold-line);
+  color: var(--bb-gold-hi);
+}
+.across-btn .key-label {
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+.across-btn .key-kicker {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+}
+.bets-off-btn .key-lamp {
+  background: #2a302c;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.bets-off-btn.is-off {
+  background: linear-gradient(180deg, var(--bb-red-hi), var(--bb-red));
+  border-color: rgba(255, 214, 200, 0.55);
+  color: #fff8ef;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--bb-shadow-1);
+  transform: none;
+}
+.bets-off-btn.is-off .key-kicker {
+  color: rgba(255, 245, 235, 0.85);
+}
+.bets-off-btn.is-off .key-lamp {
+  background: var(--bb-gold-hi);
+  box-shadow: 0 0 6px rgba(228, 204, 143, 0.8);
+}
+.start-bet-btn.is-disabled,
+.repeat-btn.is-disabled,
+.across-btn:disabled {
+  opacity: 0.42;
+}
+.repeat-btn {
+  color: var(--bb-cream);
+}
+.hand-rolls-shoot strong {
+  color: var(--bb-gold-hi);
+}
+/* Roll: one red primary everywhere (desktop used to be green). */
+.roll-btn,
+.roll-btn-pane {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, var(--bb-red-hi), var(--bb-red) 60%, #8e1822);
+  color: #fff8ef;
+  border: 1px solid rgba(255, 214, 200, 0.45);
+  box-shadow: 0 6px 16px rgba(120, 10, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.roll-btn .roll-label,
+.roll-btn-pane .roll-label {
+  color: #fff8ef;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.roll-btn .roll-kicker,
+.roll-btn-pane .roll-kicker {
+  color: rgba(255, 240, 232, 0.78);
+}
+.roll-btn:hover:not(:disabled),
+.roll-btn-pane:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.roll-hotkey {
+  color: rgba(255, 240, 232, 0.7);
+}
+.machine-key:focus-visible,
+.repeat-btn:focus-visible,
+.roll-btn:focus-visible,
+.chip:focus-visible,
+.spot:focus-visible,
+.mode-btn:focus-visible,
+.ghost:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--bb-gold-hi);
+  outline-offset: 2px;
+}
+
+/* History rail */
+.hist {
+  background: var(--bb-panel-2);
+  color: var(--bb-cream);
+  border: 1px solid var(--bb-hairline);
+  border-radius: var(--bb-r-sm);
+}
+.hist.is-seven {
+  background: var(--bb-red);
+  border-color: rgba(255, 214, 200, 0.4);
+  color: #fff8ef;
+}
+.hist.is-craps {
+  background: #2a2416;
+  border-color: var(--bb-gold-faint);
+  color: var(--bb-gold-hi);
+}
+.hist.is-hard {
+  box-shadow: inset 0 0 0 1px var(--bb-gold-hi);
+}
+.hist-total {
+  font-weight: 650;
+}
+.bet-list li,
+.log li {
+  border-bottom: 1px solid var(--bb-hairline);
+}
+
+/* Toasts */
+.toast {
+  background: rgba(17, 23, 20, 0.97);
+  border: 1px solid rgba(244, 238, 223, 0.14);
+  border-left: 3px solid var(--bb-cream-3);
+  border-radius: var(--bb-r);
+  box-shadow: var(--bb-shadow-2);
+  font-size: 0.86rem;
+  line-height: 1.3;
+}
+.toast.win {
+  border-color: rgba(127, 211, 160, 0.4);
+  border-left-color: var(--bb-win);
+}
+.toast.lose {
+  border-color: rgba(236, 138, 130, 0.35);
+  border-left-color: var(--bb-loss);
+}
+
+/* Dialogs */
+.drawer,
+.modal {
+  background: var(--bb-panel);
+  border: 1px solid var(--bb-gold-faint);
+  border-radius: var(--bb-r-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+.drawer::backdrop,
+.modal::backdrop {
+  background: rgba(3, 6, 5, 0.66);
+  backdrop-filter: blur(2px);
+}
+.drawer-inner header {
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--bb-hairline);
+}
+.drawer-inner header h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--bb-cream);
+}
+.help-body h3 {
+  font-weight: 650;
+  color: var(--bb-gold-hi);
+  font-size: 1rem;
+}
+.help-body p,
+.help-body ul {
+  color: var(--bb-cream-2);
+}
+.help-body strong {
+  color: var(--bb-cream);
+}
+.modal-inner p {
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+.coach-card {
+  background: rgba(17, 23, 20, 0.98);
+  border: 1px solid var(--bb-gold-faint);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+}
+.coach-card h2 {
+  color: var(--bb-gold-hi);
+  font-weight: 650;
+}
+.visit-count,
+.site-meta {
+  color: var(--bb-cream-3);
+}
+.visit-count strong {
+  color: var(--bb-cream-2);
+  text-shadow: none;
+}
+.pane-dot.is-active .pane-pip {
+  background: var(--bb-gold-hi) !important;
+  border-color: var(--bb-gold-hi) !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Desktop: bring the felt up the page ---------- */
+@media (min-width: 961px) {
+  .bubble-stage {
+    min-height: 0;
+    padding: 6px 0 2px;
+    margin-bottom: 12px;
+  }
+  .glass-body {
+    height: 220px;
+  }
+  .bubble-column {
+    width: min(230px, 50%);
+  }
+  .hood-dome {
+    height: 62px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .spot {
+    transition: none;
+  }
+}
+
+/* ---------- Phone landscape ---------- */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 980px) {
+  .felt-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .felt-header .practice-badge,
+  .felt-header .fun-pill {
+    display: flex;
+  }
+  .screen {
+    box-shadow:
+      inset 0 0 0 1px rgba(228, 204, 143, 0.7),
+      inset 0 0 0 3px rgba(4, 22, 13, 0.7);
+  }
+  .mode-btn {
+    min-height: 24px;
+    padding: 3px 12px;
+  }
+  /* Calm the number cells: quiet OFF tags, no clipped labels. */
+  .number-cell .off-tag {
+    padding: 0 3px;
+    font-size: 0.5rem !important;
+    letter-spacing: 0.06em;
+    border-radius: 4px;
+  }
+  .number-cell .spot.buy,
+  .number-cell .spot.place {
+    overflow: hidden;
+  }
+  [data-rules="crapless"] .number-cell .place-k {
+    letter-spacing: 0;
+  }
+  [data-rules="crapless"] .number-cell .off-tag {
+    display: none !important;
+  }
+  .puck {
+    width: 20px;
+    height: 20px;
+    font-size: 0.4rem;
+  }
+  .puck::before {
+    display: none;
+  }
+  .number-cell .mini-puck {
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    right: 2px;
+    font-size: 0.36rem;
+  }
+  .last-roll {
+    max-height: none;
+    min-height: 16px;
+  }
+  /* Hard Way All Day: one tidy row so the progress lamps never clip. */
+  .prop-middle .hard-all-day {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0 6px;
+  }
+  .prop-middle .hard-all-day .lamps {
+    margin: 0;
+    gap: 2px;
+  }
+  .prop-middle .lamp {
+    min-width: 0;
+    width: auto;
+    height: 14px;
+    padding: 0 3px;
+    border-radius: 7px;
+    font-size: 0.48rem;
+  }
+  /* Dock: real touch targets. */
+  .console .chip {
+    width: 36px;
+    height: 36px;
+  }
+  .console .chip-core {
+    font-size: 0.6rem;
+  }
+  .action-toggle button {
+    min-height: 30px;
+    padding: 4px 10px;
+  }
+  .machine-key,
+  .repeat-btn {
+    min-height: 34px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .machine-key .key-label {
+    font-size: 0.7rem;
+  }
+  .repeat-label {
+    font-size: 0.82rem;
+  }
+  /* Bubble pane: put Roll beside the cabinet so the whole bubble fits. */
+  .pane-bubble {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 10px;
+    padding: 4px 12px;
+    background:
+      radial-gradient(ellipse at 34% 60%, rgba(30, 120, 70, 0.16), transparent 50%),
+      #0a0e0c;
+  }
+  .pane-bubble .bubble-stage {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    place-items: center;
+  }
+  .pane-bubble .bubble-column {
+    width: min(200px, 34vw);
+  }
+  .pane-bubble .glass-body {
+    height: min(124px, 31dvh);
+  }
+  .bubble-roll-dock {
+    flex: 0 0 min(300px, 38vw);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 6px 0 0;
+  }
+  .bubble-back-hint {
+    order: 3;
+    margin: 0;
+    max-width: none;
+    text-align: center;
+    color: var(--bb-cream-3);
+  }
+  .bubble-hand {
+    order: 1;
+    grid-column: auto;
+    justify-self: auto;
+    align-self: center;
+    margin: 0;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .bubble-hand .k {
+    color: var(--bb-cream-3);
+  }
+  .roll-btn-pane {
+    order: 2;
+    width: 100%;
+    min-height: 72px;
+    border-radius: 18px;
+  }
+  .roll-btn-pane .roll-label {
+    font-size: 2rem;
+  }
+  /* Toasts: compact, top-right, never over the Roll button or dock. */
+  .toasts {
+    top: 30px;
+    bottom: auto;
+    right: 8px;
+    gap: 4px;
+  }
+  .toast {
+    min-width: 0;
+    max-width: 300px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+  .toast:nth-last-child(n + 4) {
+    display: none;
+  }
+}
+
+/* ---------- Phone portrait ---------- */
+@media (orientation: portrait) and (max-width: 700px) {
+  .topbar {
+    padding: 8px 10px 6px;
+  }
+  .brand h1 {
+    font-size: 1.12rem;
+    letter-spacing: 0.08em;
+  }
+  .felt-header {
+    margin-bottom: 6px;
+  }
+  .felt-header .wordmark {
+    font-size: 1.5rem;
+  }
+  /* Dock: two clean rows instead of one overlapping strip.
+     Row 1 = Place/Take down + chips. Row 2 = Bets Off · Billy's Way · Reset · Repeat. */
+  .console {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+    gap: 6px;
+    overflow: visible;
+    padding-top: 2px;
+  }
+  .chips-panel {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+  .chips {
+    gap: 8px;
+  }
+  .console .chip {
+    width: 46px;
+    height: 46px;
+  }
+  .console .chip-core {
+    font-size: 0.7rem;
+  }
+  .console .chip-bb {
+    display: block;
+  }
+  .action-toggle button {
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 0.74rem;
+  }
+  .machine-keys {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .shoot-row {
+    display: grid;
+  }
+  .machine-key,
+  .repeat-btn {
+    min-height: 44px;
+    width: 100%;
+    padding: 4px 4px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .machine-key .key-label {
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+  }
+  .across-btn .key-label {
+    font-size: 0.74rem;
+  }
+  .repeat-label {
+    font-size: 0.82rem;
+  }
+  .bets-off-btn .key-lamp {
+    width: 6px;
+    height: 6px;
+    margin: 0 auto 3px;
+  }
+  /* Bubble pane */
+  .pane-bubble {
+    background:
+      radial-gradient(ellipse at 50% 60%, rgba(30, 120, 70, 0.16), transparent 50%),
+      #0a0e0c;
+  }
+  .bubble-roll-dock {
+    align-items: center;
+  }
+  .bubble-back-hint {
+    color: var(--bb-cream-3);
+    font-size: 0.68rem;
+    margin-bottom: 0;
+  }
+  .bubble-hand {
+    margin-bottom: 0;
+  }
+  .roll-btn-pane {
+    min-height: 60px;
+    border-radius: 18px;
+  }
+  .roll-btn-pane .roll-label {
+    font-size: 1.7rem;
+  }
+  /* Sticky last-roll bar reads as a header, not an overlay. */
+  .last-roll {
+    background: #0a2a1c;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    z-index: 12;
+  }
+  /* Toasts: compact stack at the top, clear of the dock and Roll. */
+  .toasts {
+    top: 8px;
+    bottom: auto;
+    left: 10px;
+    right: 10px;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .toast {
+    min-width: 0;
+    max-width: none;
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+  .toast:nth-last-child(n + 4) {
+    display: none;
+  }
+}
+
+/* ---------- QA round 1 fixes ---------- */
+.across-btn .key-label {
+  white-space: nowrap;
+}
+@media (min-width: 961px) {
+  .across-btn .key-label {
+    font-size: 0.92rem;
+  }
+}
+@media (max-width: 960px) {
+  .last-roll .k {
+    max-width: none;
+  }
+}
+/* Off-on-come-out Place/Buy: dim the label as well as the quiet OFF tag. */
+.spot.place.is-working-off:not(.has-bet) .place-k,
+.spot.place.is-working-off:not(.has-bet) small,
+.spot.buy.is-working-off:not(.has-bet) .place-k,
+.spot.buy.is-working-off:not(.has-bet) small {
+  opacity: 0.62;
+}
+
+@media (orientation: portrait) and (max-width: 700px) {
+  /* Four equal keys on row two. */
+  .console {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .machine-keys {
+    display: contents;
+  }
+  .shoot-row {
+    display: block;
+    min-width: 0;
+  }
+  /* Lamps: neat 22px dots that never overlap (the whole spot is the button). */
+  .make-em .lamps {
+    gap: 4px;
+    padding: 2px 0 0;
+  }
+  .make-em .lamp {
+    box-sizing: border-box;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+    font-size: 0.62rem;
+  }
+  /* The Regular/Crapless switch sits right above; the felt pill was a duplicate. */
+  .rules-pill {
+    display: none;
+  }
+  .point-bar {
+    justify-content: flex-start;
+  }
+  .puck-board {
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+  .puck {
+    width: 50px;
+    height: 50px;
+    flex: 0 0 auto;
+  }
+  .hand-rolls {
+    margin-left: auto;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 980px) {
+  /* Last roll stays one slim line so the Pass row keeps its height. */
+  .last-roll {
+    max-height: 20px;
+    min-height: 16px;
+    padding: 0 6px;
+    overflow: hidden;
+  }
+  .last-roll-dice {
+    gap: 3px;
+  }
+  .last-roll .roll-die {
+    width: 14px;
+    height: 14px;
+  }
+  .last-roll-read {
+    gap: 5px;
+    align-items: center;
+  }
+  .last-roll-read strong,
+  .last-roll-eq {
+    font-size: 0.8rem;
+    line-height: 1;
+  }
+  .hard-tag {
+    padding: 0 6px;
+    font-size: 0.5rem;
+    line-height: 1.4;
+  }
+  /* Big Red reads on one line: BIG RED · ANY 7 · 4 TO 1. */
+  .any7-copy {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0 7px;
+  }
+  .any7-sub,
+  .spot.any7-hero small {
+    margin: 0;
+  }
+  /* Felt chips float at the right edge of line bets instead of shoving labels. */
+  .screen .spot.pass,
+  .screen .spot.odds,
+  .screen .spot.dont-pass,
+  .screen .spot.come,
+  .screen .spot.dont-come,
+  .screen .spot.field,
+  .screen .make-spot,
+  .screen .spot.any7-hero,
+  .screen .hard-spot,
+  .screen .hop-spot,
+  .screen .ce-spot,
+  .screen .horn-spot {
+    position: relative;
+  }
+  .screen .spot.pass.has-bet > .spot-amt,
+  .screen .spot.odds.has-bet > .spot-amt,
+  .screen .spot.dont-pass.has-bet > .spot-amt,
+  .screen .spot.come.has-bet > .spot-amt,
+  .screen .spot.dont-come.has-bet > .spot-amt,
+  .screen .spot.field.has-bet > .spot-amt,
+  .screen .make-spot.has-bet > .spot-amt,
+  .screen .spot.any7-hero.has-bet > .spot-amt,
+  .screen .hard-spot.has-bet > .spot-amt,
+  .screen .hop-spot.has-bet > .spot-amt,
+  .screen .ce-spot.has-bet > .spot-amt,
+  .screen .horn-spot.has-bet > .spot-amt {
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    z-index: 2;
+  }
+  .screen .felt-chip {
+    width: 22px;
+    height: 22px;
+  }
+  .screen .felt-chip.is-wide {
+    width: 24px;
+  }
+  .screen .felt-chip .chip-inset {
+    inset: 14%;
+  }
+  .screen .felt-chip .chip-core {
+    font-size: 0.42rem;
+  }
+}
+
+/* ---------- QA round 2: touch targets + landscape pass row ---------- */
+.action-toggle button {
+  min-height: 32px;
+}
+@media (orientation: portrait) and (max-width: 700px) {
+  .mode-btn {
+    min-height: 34px;
+    padding: 6px 12px;
+  }
+  .pane-dot {
+    min-height: 32px;
+    justify-content: center;
+    padding: 2px 12px;
+  }
+}
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 980px) {
+  .mode-btn {
+    min-height: 26px;
+  }
+  .felt-body > .pass-row {
+    flex: 0.62 1 0;
+    min-height: 20px;
+  }
+  .pass-row .spot {
+    font-size: 0.74rem;
+  }
+  .pass-row .dont-pass-note {
+    font-size: 0.5rem;
+  }
+}
+
+/* ---------- Round 3 (Bill review): toasts clear of the top bar; Yo chip ---------- */
+/* Phones: toasts sit just BELOW the top bar, compact, single-line and translucent,
+   never over the Roll button or dock. Click-through so they never block a bet. */
+@media (orientation: portrait) and (max-width: 700px) {
+  .toasts {
+    top: calc(env(safe-area-inset-top, 0px) + 130px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(340px, calc(100vw - 32px));
+    align-items: center;
+    gap: 3px;
+    pointer-events: none;
+  }
+  .toast {
+    max-width: 100%;
+    padding: 4px 12px;
+    font-size: 0.74rem;
+    line-height: 1.25;
+    border-radius: 999px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: rgba(10, 14, 12, 0.72);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+  .toast:nth-last-child(n + 3) {
+    display: none;
+  }
+}
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 980px) {
+  .toasts {
+    top: 36px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(360px, 46vw);
+    align-items: center;
+    gap: 3px;
+    pointer-events: none;
+  }
+  .toast {
+    max-width: 100%;
+    padding: 3px 12px;
+    font-size: 0.7rem;
+    line-height: 1.25;
+    border-radius: 999px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: rgba(10, 14, 12, 0.72);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+  .toast:nth-last-child(n + 3) {
+    display: none;
+  }
+  /* Hop / hard / C-E spots: reserve room for the edge chip so it never sits on the odds text. */
+  .screen .hop-spot.has-bet,
+  .screen .hard-spot.has-bet,
+  .screen .ce-spot.has-bet {
+    padding-right: 26px;
+  }
+}
