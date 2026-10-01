@@ -1544,3 +1544,140 @@ a:focus-visible {
     padding-right: 26px;
   }
 }
+
+/* ---------- Hotfix (Oct 1): portrait bubble fits short screens; side Roll buttons ---------- */
+/* Side Roll buttons exist only on the phone-portrait bubble screen. They carry .roll-btn, so the
+   existing ui.js wiring already binds them to the same roll action and disables them mid-roll. */
+.roll-btn-side {
+  display: none;
+}
+/* Container units (Safari 16+). Older engines keep the original fixed layout and no side buttons. */
+@supports (height: 1cqh) {
+@media (orientation: portrait) and (max-width: 700px) {
+  /* The bubble machine used fixed heights. On short screens (iPhone SE, or Safari with its
+     toolbars showing) the base overflowed onto the main Roll button and swallowed taps.
+     The stage is now a size container and the glass height comes from the space left over. */
+  .pane-bubble .bubble-stage {
+    container: bbstage / size;
+    overflow: hidden;
+  }
+  .pane-bubble .bubble-column {
+    --hood-h: 72px;
+    --glass-h: clamp(96px, calc(100cqh - 164px), 280px);
+  }
+  .pane-bubble .glass-body {
+    height: var(--glass-h);
+  }
+  /* keep the dice below the scallop when the glass is shorter */
+  .pane-bubble .dice-window {
+    padding-bottom: clamp(24px, calc(var(--glass-h) - 108px), 58px);
+  }
+
+  .roll-btn-side {
+    /* gap between the stage edge and the glass cylinder (cylinder = column minus 22px a side) */
+    --side-gap: calc((100cqw - min(260px, 72vw) + 44px) / 2);
+    --sz: clamp(44px, calc(var(--side-gap) - 6px), 56px);
+    position: absolute;
+    z-index: 6;
+    top: calc(var(--hood-h) + var(--glass-h) / 2 - var(--sz) / 2 + var(--side-nudge, 0px));
+    width: var(--sz);
+    height: var(--sz);
+    min-height: 0;
+    padding: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 214, 200, 0.5);
+    background:
+      radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 55%),
+      linear-gradient(180deg, var(--bb-red-hi), var(--bb-red) 60%, #8e1822);
+    box-shadow:
+      inset 0 0 0 3px rgba(142, 24, 34, 0.9),
+      inset 0 0 0 4px rgba(244, 238, 223, 0.55),
+      0 6px 14px rgba(0, 0, 0, 0.45);
+    color: #fff8ef;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .roll-btn-side-l {
+    left: calc(22px - var(--side-gap) / 2 - var(--sz) / 2);
+  }
+  .roll-btn-side-r {
+    right: calc(22px - var(--side-gap) / 2 - var(--sz) / 2);
+  }
+  .roll-btn-side:active:not(:disabled) {
+    transform: translateY(1px) scale(0.97);
+  }
+  .roll-btn-side:disabled {
+    opacity: 0.5;
+    cursor: wait;
+  }
+  .roll-side-die {
+    width: 18px;
+    height: 18px;
+  }
+  .roll-side-die rect {
+    fill: #fff8ef;
+  }
+  .roll-side-die circle {
+    fill: #8e1822;
+  }
+  .roll-side-label {
+    font-family: var(--display);
+    font-stretch: 78%;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* Short phones: the swipe hint, Roll and hand rolls share one row so the machine gets the height. */
+  @media (max-height: 720px) {
+    .bubble-roll-dock {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+    }
+    .bubble-roll-dock > .bubble-back-hint {
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: start;
+    }
+    .bubble-roll-dock > .bubble-hand {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .bubble-roll-dock > .roll-btn-pane {
+      grid-column: 2;
+      grid-row: 1;
+      width: min(210px, 52vw);
+      min-height: 56px;
+    }
+  }
+}
+/* Very short stages: slimmer hood and base so the dice still fit in the glass. */
+@container bbstage (max-height: 300px) {
+  .pane-bubble .bubble-column {
+    --hood-h: 48px;
+    --glass-h: clamp(84px, calc(100cqh - 96px), 280px);
+    --side-nudge: 6px;
+  }
+  .pane-bubble .hood-dome {
+    height: 50px;
+  }
+  .pane-bubble .hood-scallop {
+    height: 34px;
+  }
+  .pane-bubble .bubble-base {
+    height: 40px;
+  }
+  .pane-bubble .base-mark {
+    font-size: 0.7rem;
+  }
+  .pane-bubble .dice-total {
+    display: none;
+  }
+}
+}
