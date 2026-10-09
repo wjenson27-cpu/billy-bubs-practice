@@ -279,8 +279,19 @@
     return btn;
   }
 
+  function brandMark() {
+    var brand = document.createElement("div");
+    brand.className = "felt-brand";
+    brand.setAttribute("aria-hidden", "true");
+    brand.innerHTML =
+      '<div class="bb-lockup"><span class="bb-neon bb-b1">B</span><span class="bb-neon bb-b2">B</span></div>' +
+      '<p class="bb-word"></p><p class="bb-tag">Practice · No cash</p>';
+    return brand;
+  }
+
   function buildFelt() {
     els.felt.innerHTML = "";
+    els.felt.appendChild(brandMark());
     var head = document.createElement("div");
     head.className = "felt-head";
     feltName = document.createElement("h2");
@@ -292,6 +303,13 @@
     head.appendChild(flag);
     els.felt.appendChild(head);
 
+    var shell = document.createElement("div");
+    shell.className = "table-shell";
+    var leftPass = spotEl("pass", null, "Pass line", "", "pass pass-mirror");
+    var rightPass = spotEl("pass", null, "Pass line", "", "pass pass-mirror");
+    var body = document.createElement("div");
+    body.className = "table-body";
+
     var bonus = document.createElement("div");
     bonus.className = "bonus-row";
     BONUS.forEach(function (b) {
@@ -302,7 +320,7 @@
       btn.insertBefore(lamps, btn.querySelector(".amt"));
       bonus.appendChild(btn);
     });
-    els.felt.appendChild(bonus);
+    body.appendChild(bonus);
 
     var props = document.createElement("div");
     props.className = "prop-box";
@@ -338,7 +356,7 @@
     props.appendChild(hard);
     props.appendChild(mid);
     props.appendChild(hops);
-    els.felt.appendChild(props);
+    body.appendChild(props);
 
     var nums = document.createElement("div");
     nums.className = "num-row";
@@ -359,8 +377,8 @@
       tag.className = "come-tag";
       var odds = document.createElement("div");
       odds.className = "odds-row";
-      odds.appendChild(spotEl("comeOdds", n, "Odds", ""));
-      odds.appendChild(spotEl("dontComeOdds", n, "Lay", ""));
+      odds.appendChild(spotEl("comeOdds", n, "C odds", ""));
+      odds.appendChild(spotEl("dontComeOdds", n, "DC lay", ""));
       box.appendChild(face);
       box.appendChild(bets);
       box.appendChild(tag);
@@ -368,29 +386,38 @@
       nums.appendChild(box);
     });
     nums.appendChild(spotEl("big8", null, "Big 8", "even", "big"));
-    els.felt.appendChild(nums);
+    body.appendChild(nums);
 
     var come = document.createElement("div");
     come.className = "line-row come";
-    come.appendChild(spotEl("come", null, "Come", "after the point"));
-    come.appendChild(spotEl("dontCome", null, "Don't Come", "after the point"));
-    els.felt.appendChild(come);
+    come.appendChild(spotEl("come", null, "Come", "", "band"));
+    come.appendChild(spotEl("dontCome", null, "Don't Come", ""));
+    body.appendChild(come);
 
-    var lines = document.createElement("div");
-    lines.className = "line-row two";
-    lines.appendChild(spotEl("dontPass", null, "Don't Pass", "bar 12"));
-    lines.appendChild(spotEl("dontPassOdds", null, "Lay Odds", "fair"));
-    lines.appendChild(spotEl("pass", null, "Pass Line", "come-out", "pass"));
-    lines.appendChild(spotEl("passOdds", null, "Odds", "fair"));
-    els.felt.appendChild(lines);
-
-    var field = spotEl("field", null, "Field", fieldCopy("double"), "field");
+    var field = spotEl("field", null, "Field", fieldCopy("double"), "field band");
     fieldHint = field.querySelector(".hint");
     var numsLabel = document.createElement("span");
     numsLabel.className = "nums";
-    numsLabel.innerHTML = "2 <em>3 4 9 10 11</em> 12";
+    numsLabel.innerHTML = "<em>2</em> 3 4 9 10 11 <em>12</em>";
     field.insertBefore(numsLabel, field.querySelector(".amt"));
-    els.felt.appendChild(field);
+    body.appendChild(field);
+
+    var dont = document.createElement("div");
+    dont.className = "line-row dont";
+    dont.appendChild(spotEl("dontPass", null, "Don't Pass", "Bar 12", "band"));
+    dont.appendChild(spotEl("dontPassOdds", null, "Lay odds", ""));
+    body.appendChild(dont);
+
+    var pass = document.createElement("div");
+    pass.className = "line-row passline";
+    pass.appendChild(spotEl("pass", null, "Pass line", "", "pass pass-main band"));
+    pass.appendChild(spotEl("passOdds", null, "Odds", ""));
+    body.appendChild(pass);
+
+    shell.appendChild(leftPass);
+    shell.appendChild(body);
+    shell.appendChild(rightPass);
+    els.felt.appendChild(shell);
 
     var layer = document.createElement("div");
     layer.className = "dice-layer";
@@ -406,7 +433,7 @@
       var el = document.createElement("div");
       el.className = "die";
       el.style.left = i === 0 ? "42%" : "58%";
-      el.style.top = "62%";
+      el.style.top = "48%";
       var scene = document.createElement("div");
       scene.className = "die-scene";
       var cube = document.createElement("div");
@@ -428,7 +455,7 @@
         cube: cube,
         ori: G.identity(),
         x: i === 0 ? 42 : 58,
-        y: 62,
+        y: 48,
       };
       dice.push(die);
       bindDie(die);
@@ -694,6 +721,42 @@
     });
   }
 
+  function breakChips(cents) {
+    var denoms = [100, 25, 10, 5, 1];
+    var left = Math.max(0, Math.round(cents / 100));
+    var out = [];
+    var i;
+    for (i = 0; i < denoms.length; i++) {
+      var count = Math.floor(left / denoms[i]);
+      var shown = Math.min(count, 4 - out.length);
+      var k;
+      for (k = 0; k < shown; k++) out.push(denoms[i]);
+      left -= count * denoms[i];
+      if (out.length >= 4) break;
+    }
+    if (!out.length) out.push(1);
+    return out;
+  }
+
+  function paintStack(holder, cents, label) {
+    holder.innerHTML = "";
+    if (!cents) return;
+    var text = document.createElement("span");
+    text.className = "amt-text";
+    text.textContent = label;
+    var stack = document.createElement("span");
+    stack.className = "stack";
+    breakChips(cents).forEach(function (dollars, index) {
+      var piece = document.createElement("i");
+      piece.className = "mini is-" + dollars;
+      piece.style.setProperty("--i", String(index));
+      piece.setAttribute("aria-hidden", "true");
+      stack.appendChild(piece);
+    });
+    holder.appendChild(text);
+    holder.appendChild(stack);
+  }
+
   function amountText(kind, amount) {
     var text = E.dollars(amount);
     var off = game.phase === "come-out" && amount > 0;
@@ -712,7 +775,9 @@
       var amount = E.getAmount(game, spot);
       el.classList.toggle("has-bet", amount > 0);
       var amt = el.querySelector(".amt");
-      if (amt) amt.textContent = amount ? amountText(spot.kind, amount) : "";
+      if (!amt || el.classList.contains("pass-mirror")) return;
+      if (amount) paintStack(amt, amount, amountText(spot.kind, amount));
+      else amt.innerHTML = "";
     });
     els.felt.querySelectorAll(".num").forEach(function (box) {
       var n = Number(box.dataset.number);
@@ -882,6 +947,12 @@
     })[0] || THEMES[0];
     document.body.setAttribute("data-felt", theme.id);
     if (feltName) feltName.textContent = theme.name;
+    var word = document.querySelector(".bb-word");
+    var tag = document.querySelector(".bb-tag");
+    var brand = document.querySelector(".felt-brand");
+    if (word) word.textContent = theme.name;
+    if (tag) tag.textContent = theme.id === "billy" || theme.id === "bubble" ? "Practice · No cash" : "Practice";
+    if (brand) brand.setAttribute("data-brand", theme.id);
     els.themes.querySelectorAll(".theme-swatch").forEach(function (btn) {
       var on = btn.getAttribute("data-felt") === theme.id;
       btn.classList.toggle("is-on", on);
@@ -955,10 +1026,20 @@
     CHIPS.forEach(function (dollars) {
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "chip";
+      btn.className = "chip is-" + dollars;
       btn.setAttribute("data-value", String(dollars));
-      btn.textContent = "$" + dollars;
       btn.setAttribute("aria-label", "$" + dollars + " chip");
+      var face = document.createElement("span");
+      face.className = "chip-face";
+      var mark = document.createElement("span");
+      mark.className = "chip-bb";
+      mark.textContent = "BB";
+      var val = document.createElement("span");
+      val.className = "chip-val";
+      val.textContent = "$" + dollars;
+      face.appendChild(mark);
+      face.appendChild(val);
+      btn.appendChild(face);
       btn.addEventListener("click", function () {
         chip = dollars * 100;
         markChip();
