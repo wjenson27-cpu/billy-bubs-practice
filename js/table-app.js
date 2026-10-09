@@ -100,6 +100,7 @@
   var saved = loadStore();
   var chip = saved.chip || 1000;
   var betMode = "place";
+  var numMode = "place";
   var busy = false;
   var watchStop = false;
   var memory = {};
@@ -291,7 +292,6 @@
 
   function buildFelt() {
     els.felt.innerHTML = "";
-    els.felt.appendChild(brandMark());
     var head = document.createElement("div");
     head.className = "felt-head";
     feltName = document.createElement("h2");
@@ -360,32 +360,44 @@
 
     var nums = document.createElement("div");
     nums.className = "num-row";
-    nums.appendChild(spotEl("big6", null, "Big 6", "even", "big"));
-    ;[4, 5, 6, 8, 9, 10].forEach(function (n) {
-      var box = document.createElement("div");
-      box.className = "num";
-      box.dataset.number = String(n);
-      var face = document.createElement("div");
-      face.className = "num-face";
-      face.textContent = String(n);
-      var bets = document.createElement("div");
-      bets.className = "num-bets";
-      bets.appendChild(spotEl("place", n, "Place", ""));
-      bets.appendChild(spotEl("buy", n, "Buy", ""));
-      bets.appendChild(spotEl("lay", n, "Lay", ""));
-      var tag = document.createElement("div");
-      tag.className = "come-tag";
-      var odds = document.createElement("div");
-      odds.className = "odds-row";
-      odds.appendChild(spotEl("comeOdds", n, "C odds", ""));
-      odds.appendChild(spotEl("dontComeOdds", n, "DC lay", ""));
-      box.appendChild(face);
-      box.appendChild(bets);
-      box.appendChild(tag);
-      box.appendChild(odds);
-      nums.appendChild(box);
+    var mode = document.createElement("div");
+    mode.className = "num-mode";
+    mode.setAttribute("role", "radiogroup");
+    mode.setAttribute("aria-label", "Bet on a number");
+    [
+      ["place", "Place"],
+      ["buy", "Buy"],
+      ["lay", "Lay"],
+      ["comeOdds", "Odds"],
+      ["dontComeOdds", "DC lay"],
+    ].forEach(function (row) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "mode-btn";
+      btn.dataset.kind = row[0];
+      btn.setAttribute("role", "radio");
+      btn.textContent = row[1];
+      btn.title = row[0] === "comeOdds" ? "Come odds" : row[0] === "dontComeOdds" ? "Don't come lay odds" : row[1];
+      btn.addEventListener("click", function () {
+        setNumMode(row[0]);
+      });
+      mode.appendChild(btn);
     });
-    nums.appendChild(spotEl("big8", null, "Big 8", "even", "big"));
+    var stage = document.createElement("div");
+    stage.className = "points-stage";
+    stage.appendChild(brandMark());
+    stage.appendChild(spotEl("big6", null, "Big 6", "even", "big"));
+    ;[4, 5, 6, 8, 9, 10].forEach(function (n) {
+      var hit = spotEl("place", n, String(n), "", "num num-hit");
+      hit.querySelector(".lbl").classList.add("num-face");
+      var tag = document.createElement("span");
+      tag.className = "come-tag";
+      hit.insertBefore(tag, hit.querySelector(".amt"));
+      stage.appendChild(hit);
+    });
+    stage.appendChild(spotEl("big8", null, "Big 8", "even", "big"));
+    nums.appendChild(mode);
+    nums.appendChild(stage);
     body.appendChild(nums);
 
     var come = document.createElement("div");
@@ -418,6 +430,7 @@
     shell.appendChild(body);
     shell.appendChild(rightPass);
     els.felt.appendChild(shell);
+    setNumMode(numMode);
 
     var layer = document.createElement("div");
     layer.className = "dice-layer";
@@ -427,13 +440,24 @@
     applyTheme(document.body.getAttribute("data-felt") || "billy");
   }
 
+  function restPoint(index, salt) {
+    var n = salt == null ? index : salt;
+    var jx = ((n * 3 + index * 5) % 7) - 3;
+    var jy = (n + index * 2) % 3;
+    return {
+      x: clamp(index === 0 ? 24 + jx : 76 + jx, 16, 84),
+      y: clamp(11 + jy, 8, 16),
+    };
+  }
+
   function buildDice(layer) {
     dice = [];
     ;[0, 1].forEach(function (i) {
+      var rest = restPoint(i, i);
       var el = document.createElement("div");
       el.className = "die";
-      el.style.left = i === 0 ? "42%" : "58%";
-      el.style.top = "48%";
+      el.style.left = rest.x + "%";
+      el.style.top = rest.y + "%";
       var scene = document.createElement("div");
       scene.className = "die-scene";
       var cube = document.createElement("div");
@@ -454,8 +478,8 @@
         el: el,
         cube: cube,
         ori: G.identity(),
-        x: i === 0 ? 42 : 58,
-        y: 48,
+        x: rest.x,
+        y: rest.y,
       };
       dice.push(die);
       bindDie(die);
@@ -595,10 +619,11 @@
       }
       var x0 = die.x;
       var y0 = die.y;
-      var wallX = clamp(28 + die.index * 36 + ((top * 3) % 7) - 3, 18, 82);
-      var wallY = 14 + die.index * 3;
-      var endX = die.index === 0 ? 40 : 60;
-      var endY = 46;
+      var rest = restPoint(die.index, top);
+      var wallX = clamp(rest.x + (die.index === 0 ? -8 : 8), 14, 86);
+      var wallY = 5;
+      var endX = rest.x;
+      var endY = rest.y;
       var t0 = performance.now();
       var step = -1;
       var dirs = ["up", "right", "up", "left", "down", "right"];
@@ -787,6 +812,17 @@
       var dc = game.bets.dontComeBets[n];
       if (come && come.amount) bits.push("Come " + E.dollars(come.amount));
       if (dc && dc.amount) bits.push("DC " + E.dollars(dc.amount));
+      [
+        ["place", "Place"],
+        ["buy", "Buy"],
+        ["lay", "Lay"],
+        ["comeOdds", "Odds"],
+        ["dontComeOdds", "Lay"],
+      ].forEach(function (row) {
+        if (row[0] === box.dataset.kind) return;
+        var amount = E.getAmount(game, { kind: row[0], number: n });
+        if (amount) bits.push(row[1] + " " + E.dollars(amount));
+      });
       box.querySelector(".come-tag").textContent = bits.join(" · ");
     });
     els.felt.querySelectorAll("[data-progress]").forEach(function (el) {
@@ -959,6 +995,20 @@
       btn.setAttribute("aria-checked", on ? "true" : "false");
     });
     saveStore();
+  }
+
+  function setNumMode(kind) {
+    numMode = kind;
+    document.querySelectorAll(".mode-btn").forEach(function (btn) {
+      var on = btn.dataset.kind === kind;
+      btn.classList.toggle("is-on", on);
+      btn.setAttribute("aria-checked", on ? "true" : "false");
+    });
+    document.querySelectorAll(".num-hit").forEach(function (btn) {
+      btn.dataset.kind = kind;
+      btn.setAttribute("aria-label", E.describeSpot({ kind: kind, number: Number(btn.dataset.number) }));
+    });
+    if (game && els.felt.querySelector(".num-hit")) renderFelt();
   }
 
   function shortLandscape() {
