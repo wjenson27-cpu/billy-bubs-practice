@@ -740,6 +740,76 @@
     });
   }
 
+  /**
+   * Low Rolls, High Rolls, Roll 'Em All, and Hard Way All Day.
+   * Mutates state.bets, state.progress, and state.bankroll. Shared with the full table.
+   */
+  function settleBonusBets(state, d1, d2, decisions) {
+    if (!state || !state.bets) return decisions || [];
+    decisions = decisions || [];
+    if (!state.progress) state.progress = emptyProgress();
+    var total = d1 + d2;
+    var hard = d1 === d2;
+    var kinds = ["small", "tall", "all"];
+    var k;
+    for (k = 0; k < kinds.length; k++) {
+      var kind = kinds[k];
+      var stake = state.bets[kind];
+      if (!stake) continue;
+      var set = makeEmSet(kind);
+      var label = describeSpot({ kind: kind });
+      if (!state.progress[kind]) state.progress[kind] = {};
+      if (total === 7) {
+        state.bets[kind] = 0;
+        state.progress[kind] = {};
+        decisions.push({ bet: label, result: "lose", stake: stake, profit: 0, net: -stake, kind: kind });
+        continue;
+      }
+      if (set.indexOf(total) >= 0) state.progress[kind][total] = true;
+      if (progressComplete(state.progress[kind], set)) {
+        var forPay = MAKE_EM_FOR[kind];
+        var profit = stake * (forPay - 1);
+        state.bankroll += stake + profit;
+        state.bets[kind] = 0;
+        state.progress[kind] = {};
+        decisions.push({ bet: label, result: "win", stake: stake, profit: profit, net: profit, kind: kind });
+      }
+    }
+    var hwStake = state.bets.hardAllDay;
+    if (hwStake) {
+      if (!state.progress.hardAllDay) state.progress.hardAllDay = {};
+      if (total === 7) {
+        state.bets.hardAllDay = 0;
+        state.progress.hardAllDay = {};
+        decisions.push({
+          bet: "Hard Way All Day",
+          result: "lose",
+          stake: hwStake,
+          profit: 0,
+          net: -hwStake,
+          kind: "hardAllDay",
+        });
+      } else {
+        if (hard && HARDWAYS.indexOf(total) >= 0) state.progress.hardAllDay[total] = true;
+        if (progressComplete(state.progress.hardAllDay, HARDWAYS)) {
+          var hwProfit = hwStake * (MAKE_EM_FOR.hardAllDay - 1);
+          state.bankroll += hwStake + hwProfit;
+          state.bets.hardAllDay = 0;
+          state.progress.hardAllDay = {};
+          decisions.push({
+            bet: "Hard Way All Day",
+            result: "win",
+            stake: hwStake,
+            profit: hwProfit,
+            net: hwProfit,
+            kind: "hardAllDay",
+          });
+        }
+      }
+    }
+    return decisions;
+  }
+
   function settle(state, d1, d2) {
     var next = clone(state);
     var total = d1 + d2;
@@ -825,52 +895,7 @@
       }
     });
 
-    function settleMakeEm() {
-      var kinds = ["small", "tall", "all"];
-      kinds.forEach(function (kind) {
-        var stake = next.bets[kind];
-        if (!stake) return;
-        var set = makeEmSet(kind);
-        var label = describeSpot({ kind: kind });
-        if (total === 7) {
-          next.bets[kind] = 0;
-          next.progress[kind] = {};
-          decisions.push({ bet: label, result: "lose", stake: stake, profit: 0, net: -stake });
-          return;
-        }
-        if (set.indexOf(total) >= 0) next.progress[kind][total] = true;
-        if (progressComplete(next.progress[kind], set)) {
-          var forPay = MAKE_EM_FOR[kind];
-          var profit = stake * (forPay - 1);
-          next.bankroll += stake + profit;
-          next.bets[kind] = 0;
-          next.progress[kind] = {};
-          decisions.push({ bet: label, result: "win", stake: stake, profit: profit, net: profit });
-        }
-      });
-    }
-    settleMakeEm();
-
-    (function settleHardAllDay() {
-      var stake = next.bets.hardAllDay;
-      if (!stake) return;
-      if (total === 7) {
-        next.bets.hardAllDay = 0;
-        next.progress.hardAllDay = {};
-        decisions.push({ bet: "Hard Way All Day", result: "lose", stake: stake, profit: 0, net: -stake });
-        return;
-      }
-      if (hard && HARDWAYS.indexOf(total) >= 0) {
-        next.progress.hardAllDay[total] = true;
-      }
-      if (progressComplete(next.progress.hardAllDay, HARDWAYS)) {
-        var profit = stake * (MAKE_EM_FOR.hardAllDay - 1);
-        next.bankroll += stake + profit;
-        next.bets.hardAllDay = 0;
-        next.progress.hardAllDay = {};
-        decisions.push({ bet: "Hard Way All Day", result: "win", stake: stake, profit: profit, net: profit });
-      }
-    })();
+    settleBonusBets(next, d1, d2, decisions);
 
     var placeWorking = placeBetsWorking(next);
     var pn, pa;
@@ -1514,6 +1539,7 @@
     resetSession: resetSession,
     switchMode: switchMode,
     settle: settle,
+    settleBonusBets: settleBonusBets,
     rollDie: rollDie,
     rollDice: rollDice,
     snapshotWagers: snapshotWagers,

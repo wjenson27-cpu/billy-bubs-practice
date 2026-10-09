@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Billy Bubs Practice — Craps Table</title>
+    <meta name="description" content="Billy Bubs Practice — a full craps table for practice. No cash. No real money." />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&amp;family=Cinzel:wght@600;700&amp;display=swap" />
+    <link rel="stylesheet" href="css/table.css" />
+    <meta name="theme-color" content="#0a0e0c" />
+  </head>
+  <body data-felt="billy">
+    <a class="skip-link" href="#felt">Skip to table</a>
+    <header class="top">
+      <div class="brand">
+        <div class="practice-badge">
+          <span class="practice-dot" aria-hidden="true"></span>
+          <div>
+            <p class="kicker">Practice</p>
+            <p class="cash">No cash</p>
+          </div>
+        </div>
+        <div>
+          <h1>Billy Bubs</h1>
+          <p class="tagline"><span aria-hidden="true">★</span> Practice <span aria-hidden="true">★</span> · Craps table</p>
+        </div>
+      </div>
+      <a class="bubble-link" href="index.html">Bubble craps</a>
+      <div class="rack" aria-label="Bankroll">
+        <div class="rack-stat">
+          <span class="k">Balance</span>
+          <strong id="bankroll">$1,000</strong>
+          <span class="fun-tag">FUN</span>
+        </div>
+        <div class="rack-stat">
+          <span class="k">On table</span>
+          <strong id="on-table">$0</strong>
+        </div>
+        <div class="rack-stat">
+          <span class="k">Session</span>
+          <strong id="net-pl">$0</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="app">
+      <section class="stage" aria-label="Craps table">
+        <div class="felt-toolbar">
+          <div class="themes" id="themes" role="radiogroup" aria-label="Felt"></div>
+          <div class="phase-read" id="phase-read">
+            <span class="puck" id="puck" data-on="false">OFF</span>
+            <span id="phase-label">Come-out</span>
+          </div>
+          <div class="last-roll" id="last-roll" aria-live="polite">No roll yet</div>
+        </div>
+        <div class="felt-fit" id="felt-fit">
+          <div class="felt" id="felt"></div>
+        </div>
+      </section>
+
+      <aside class="side" aria-label="Controls">
+        <div class="dock" id="dock">
+          <div class="chip-row" id="chips" role="radiogroup" aria-label="Chip"></div>
+          <div class="dock-actions">
+            <div class="seg" role="group" aria-label="Bet action">
+              <button type="button" id="btn-place" class="is-on">Place</button>
+              <button type="button" id="btn-take">Take</button>
+            </div>
+            <button type="button" class="ghost" id="btn-max-odds">Max odds</button>
+            <button type="button" class="roll" id="roll-btn">Roll</button>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Table panels">
+          <button type="button" class="tab is-on" data-tab="dice" role="tab" aria-selected="true">Dice</button>
+          <button type="button" class="tab" data-tab="strategy" role="tab" aria-selected="false">Strategy</button>
+          <button type="button" class="tab" data-tab="sim" role="tab" aria-selected="false">Simulator</button>
+          <button type="button" class="tab" data-tab="session" role="tab" aria-selected="false">Session</button>
+          <button type="button" class="tab" data-tab="settings" role="tab" aria-selected="false">Table</button>
+        </div>
+
+        <div class="panels">
+          <section class="panel" data-panel="dice">
+            <h2>Dice set</h2>
+            <p class="note">On a fair table, the way you set the dice does not change the odds. Turn each die with a tap or a flick. Drag it where you want it, then roll.</p>
+            <div class="set-grid" id="set-grid"></div>
+            <div class="face-pick" id="face-pick"></div>
+            <div class="control-box">
+              <label class="check"><input type="checkbox" id="ctrl-on" /> Controlled shooter</label>
+              <p class="note">Off unless you turn it on. Use it to see how much influence it would take to matter.</p>
+              <div id="ctrl-body" hidden>
+                <label class="check"><input type="radio" name="ctrl-mode" value="influence" checked /> Match my set</label>
+                <label class="slider">Influence <input type="range" id="ctrl-inf" min="0" max="100" value="10" /> <span id="ctrl-inf-label">10%</span></label>
+                <label class="check"><input type="radio" name="ctrl-mode" value="srr" /> Rolls per seven</label>
+                <label class="slider">SRR <input type="range" id="ctrl-srr" min="3" max="18" step="1" value="6" /> <span id="ctrl-srr-label">6</span></label>
+                <p class="note">A fair table lands about one seven every 6 rolls. Higher means fewer sevens.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" data-panel="strategy" hidden>
+            <h2>Strategies</h2>
+            <p class="note">Auto places the bets for you before each roll. Coach only tells you the next bet.</p>
+            <div class="play-mode" role="radiogroup" aria-label="How to use a strategy">
+              <label><input type="radio" name="play-mode" value="hand" checked /> By hand</label>
+              <label><input type="radio" name="play-mode" value="coach" /> Coach</label>
+              <label><input type="radio" name="play-mode" value="auto" /> Auto</label>
+            </div>
+            <label class="field-label">Strategy
+              <select id="strategy-pick"></select>
+            </label>
+            <article class="strategy-card" id="strategy-card"></article>
+            <div class="coach-line" id="coach-line" hidden></div>
+            <h3>Bonus bets</h3>
+            <p class="note">Same bonuses as the bubble table. They can ride along with a strategy.</p>
+            <div class="bonus-opts" id="bonus-opts"></div>
+          </section>
+
+          <section class="panel" data-panel="sim" hidden>
+            <h2>Simulator</h2>
+            <p class="note">Same rules as the table. Pick strategies, a bankroll, and how many rolls. Compare odds on the same strategy by adding it twice.</p>
+            <div id="sim-rows"></div>
+            <div class="sim-add">
+              <select id="sim-add-strategy"></select>
+              <button type="button" class="ghost" id="sim-add">Add</button>
+            </div>
+            <div class="bonus-opts" id="sim-bonuses"></div>
+            <div class="sim-grid">
+              <label>Rolls
+                <select id="sim-rolls">
+                  <option value="100">100</option>
+                  <option value="250" selected>250</option>
+                  <option value="500">500</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label>Custom <input type="number" id="sim-custom-rolls" min="10" max="5000" value="100" /></label>
+              <label>Trials <input type="number" id="sim-trials" min="50" max="5000" value="1000" /></label>
+              <label>Bankroll $ <input type="number" id="sim-bank" min="10" step="10" value="1000" /></label>
+              <label>Table min $ <input type="number" id="sim-min" min="1" step="1" value="10" /></label>
+            </div>
+            <button type="button" class="solid" id="sim-run">Run simulation</button>
+            <p class="note" id="sim-status"></p>
+            <div class="chart-wrap">
+              <canvas id="sim-chart" width="640" height="280" aria-label="Bankroll over rolls"></canvas>
+            </div>
+            <div id="sim-legend" class="legend"></div>
+            <div class="table-scroll">
+              <table class="compare" id="sim-table"></table>
+            </div>
+            <button type="button" class="ghost" id="sim-watch">Watch one session on the felt</button>
+          </section>
+
+          <section class="panel" data-panel="session" hidden>
+            <h2>This session</h2>
+            <dl class="stats" id="stats"></dl>
+            <h3>Numbers</h3>
+            <div class="histobar" id="histobar"></div>
+            <h3>Recent rolls</h3>
+            <div class="history" id="history"></div>
+            <ol class="log" id="log"></ol>
+            <button type="button" class="ghost" id="btn-new">New session</button>
+          </section>
+
+          <section class="panel" data-panel="settings" hidden>
+            <h2>Table settings</h2>
+            <label class="field-label">Pass line odds
+              <select id="odds-pass"></select>
+            </label>
+            <label class="check"><input type="checkbox" id="link-lines" checked /> Same odds on come</label>
+            <label class="field-label" id="come-odds-label">Come odds
+              <select id="odds-come"></select>
+            </label>
+            <label class="field-label">Don't pass lay odds
+              <select id="odds-dont"></select>
+            </label>
+            <label class="check"><input type="checkbox" id="link-dont" checked /> Same lay odds on don't come</label>
+            <label class="field-label" id="dc-odds-label">Don't come lay odds
+              <select id="odds-dc"></select>
+            </label>
+            <label class="field-label">Field, 2 and 12
+              <select id="field-mode">
+                <option value="double">Both pay 2 to 1</option>
+                <option value="twelveTriple">2 pays 2 to 1, 12 pays 3 to 1</option>
+                <option value="triple">Both pay 3 to 1</option>
+              </select>
+            </label>
+            <label class="field-label">Buy commission
+              <select id="vig-buy">
+                <option value="win">5% taken on a win</option>
+                <option value="upfront">5% paid up front</option>
+              </select>
+            </label>
+            <label class="field-label">Lay commission
+              <select id="vig-lay">
+                <option value="upfront">5% of the win, up front</option>
+                <option value="win">5% of the win, on a win</option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" id="hard-off" /> Hardways off on the come-out</label>
+            <label class="check"><input type="checkbox" id="place-on" /> Place and buy work on the come-out</label>
+            <label class="field-label">Table minimum $
+              <input type="number" id="table-min" min="1" step="1" value="10" />
+            </label>
+            <label class="field-label">New session bankroll $
+              <input type="number" id="start-bank" min="10" step="10" value="1000" />
+            </label>
+            <button type="button" class="ghost" id="btn-rules">Rules</button>
+          </section>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <p>Practice only. No real money. Not affiliated with any casino or equipment maker.</p>
+      <p class="site-meta">Visits <strong id="visit-count">…</strong></p>
+    </footer>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <dialog class="rules" id="rules">
+      <form method="dialog">
+        <header>
+          <h2>How this table plays</h2>
+          <button type="submit" class="ghost" value="close">Close</button>
+        </header>
+        <div class="rules-body">
+          <p>Come-out: 7 or 11 wins the pass line. 2, 3, or 12 loses it. Any other number is the point. Then the pass line wins if the point shows before a 7.</p>
+          <p>Don't pass wins on 2 or 3, loses on 7 or 11, and pushes on 12. After a point, it wins on a 7.</p>
+          <p>Odds are a fair bet. 3-4-5x means 3 times on 4 and 10, 4 times on 5 and 9, and 5 times on 6 and 8. Lay odds are capped so the win matches that multiple. 5x and 10x are flat multiples, with the matching lay.</p>
+          <p>Place pays 9:5 on 4 and 10, 7:5 on 5 and 9, and 7:6 on 6 and 8. Buy pays true odds with a 5% commission. Lay is the other side of a buy, with commission on the amount you can win.</p>
+          <p>Come and don't come work like pass and don't pass, after a point is on. Come odds are off on the come-out. Don't come odds are working.</p>
+          <p>Low Rolls, High Rolls, Roll 'Em All, and Hard Way All Day are the same bonuses as the bubble table. A 7 before the set is finished loses them.</p>
+          <p>Setting the dice does not change a fair roll. Controlled shooter is a practice dial and stays off until you turn it on.</p>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="js/engine.js"></script>
+    <script src="js/die-geom.js"></script>
+    <script src="js/table-engine.js"></script>
+    <script src="js/strategies.js"></script>
+    <script src="js/table-app.js"></script>
+    <!-- Cloudflare Web Analytics --><script type="module" defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "979ed6d735ee4ae1a6fe313fb2ae3b53"}'></script><!-- End Cloudflare Web Analytics -->
+    <script>
+      (function () {
+        var el = document.getElementById("visit-count");
+        if (!el) return;
+        fetch("https://abacus.jasoncameron.dev/hit/billy-bubs-practice/visits")
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            el.textContent = Number(d && d.value != null ? d.value : 0).toLocaleString("en-US");
+          })
+          .catch(function () { el.textContent = "—"; });
+      })();
+    </script>
+  </body>
+</html>
