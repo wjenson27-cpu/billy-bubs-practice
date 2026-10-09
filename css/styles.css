@@ -104,6 +104,23 @@ input {
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
+.table-jump,
+.pane-table-link {
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.table-jump {
+  display: inline-block;
+  margin-top: 4px;
+}
+.pane-table-link {
+  grid-column: 1;
+  justify-self: start;
+}
 .practice-badge,
 .fun-pill,
 .rack-fun {

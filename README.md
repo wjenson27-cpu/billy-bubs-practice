@@ -4,6 +4,12 @@ A static practice machine for **Billy Bubs Practice** — **Bubble Craps**, one 
 
 **Practice only. No cash. No real-money wagering.**
 
+The bubble machine stays on [index.html](index.html). A separate full craps layout is on [table.html](table.html): pass, don’t pass, come, don’t come, odds, place, buy, lay, field, hardways, props, and the same bonus bets as the bubble table (Low Rolls, High Rolls, Roll ’Em All, Hard Way All Day). Felts, odds (3-4-5x, 5x, or 10x), and the other table options are remembered in the browser. Strategies can coach, bet for you, or run in the simulator. The simulator uses the same rules as the live table.
+
+```bash
+node tests/table-engine.test.js
+```
+
 ## Play on your phone (GitHub Pages)
 
 Intended live URL after Pages is enabled:
